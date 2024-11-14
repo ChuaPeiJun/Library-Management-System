@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.demo.LibraryAppController">
+    <!-- Welcome Text -->
+    <Text text="Welcome to Library Management System" layoutX="100" layoutY="50" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+    <!-- Role Selection Text -->
+    <Text text="Please select your role" layoutX="150" layoutY="100" style="-fx-font-size: 18px;"/>
+
+    <!-- Role Selection VBox -->
+    <VBox spacing="20" layoutX="150" layoutY="150">
+        <Button fx:id="adminButton" text="Admin" onAction="#handleAdminButton"/>
+        <Button fx:id="userButton" text="User" onAction="#handleUserButton"/>
+    </VBox>
+</AnchorPane>
