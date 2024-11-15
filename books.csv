@@ -1,4 +1,11 @@
-Title,Author,ISBN,Available,BorrowerName
-Java Basics,John Doe,123456789,true,
-Python for Data Science,Jane Smith,987654321,true,
-The Art of Programming,Alan Turing,112233445,true,
+Title,Author,ISBN,Available,Borrower
+The Great Gatsby,F. Scott Fitzgerald,9780743273565,Yes,
+To Kill a Mockingbird,Harper Lee,9780061120084,No,John Doe
+1984,George Orwell,9780451524935,Yes,
+Moby Dick,Herman Melville,9781503280786,No,Jane Smith
+War and Peace,Leo Tolstoy,9781853260629,Yes,
+Pride and Prejudice,Jane Austen,9781503290563,No,Sam Wilson
+The Catcher in the Rye,J.D. Salinger,9780316769488,Yes,
+The Lord of the Rings,J.R.R. Tolkien,9780544003415,No,Mary Johnson
+The Hobbit,J.R.R. Tolkien,9780618968633,Yes,
+Crime and Punishment,Fyodor Dostoevsky,9780486415871,No,Peter Parker

@@ -1,18 +1,21 @@
 package com.example.demo;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
     private String name;
-    private String email;
-    private String role;
+    private String id;
+    private List<Book> borrowedBooks;
 
-    public User(String name, String email, String role) {
+    public User(String name, String id) {
         this.name = name;
-        this.email = email;
-        this.role = role;
+        this.id = id;
+        this.borrowedBooks = new ArrayList<Book>(); // Initialize the list
     }
 
-    // Getters
     public String getName() { return name; }
-    public String getEmail() { return email; }
-    public String getRole() { return role; }
+    public String getId() { return id; }
+    public java.util.List<Book> getBorrowedBooks() { return borrowedBooks; }
+    public void setBorrowedBooks(java.util.List<Book> borrowedBooks) { this.borrowedBooks = borrowedBooks; }
 }

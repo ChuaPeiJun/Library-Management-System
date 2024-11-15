@@ -1,21 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.control.ListView?>
 <AnchorPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: lightyellow;" xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.demo.AdminController">
-    <!-- Admin Management Text -->
-    <Text text="Admin Management Page" layoutX="150" layoutY="50" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+    <Text text="Admin Management Page" layoutX="20" layoutY="30" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
 
-    <!-- Admin Actions VBox -->
-    <VBox spacing="15" layoutX="150" layoutY="100">
-        <Button fx:id="addBookButton" text="Add Book" onAction="#handleAddBook"/>
-        <Button fx:id="searchBookButton" text="Search Book" onAction="#handleSearchBook"/>
-        <Button fx:id="viewBookListButton" text="View Book List" onAction="#handleViewBookList"/>
-        <Button fx:id="addUserButton" text="Add User" onAction="#handleAddUser"/>
-        <Button fx:id="searchUserButton" text="Search User" onAction="#handleSearchUser"/>
-        <Button fx:id="viewUserListButton" text="View User List" onAction="#handleViewUserList"/>
-        <Button fx:id="backButton" text="Back to Homepage" onAction="#handleBackButton"/>
+    <VBox spacing="15" layoutX="20" layoutY="70">
+        <Button fx:id="manageBooksButton" text="Manage Books" onAction="#handleManageBooks"/>
+        <Button fx:id="manageUsersButton" text="Manage Users" onAction="#handleManageUsers"/>
+    </VBox>
+
+    <!-- Book Management View -->
+    <VBox fx:id="bookManagementView" spacing="10" layoutX="200" layoutY="70" visible="false">
+        <HBox spacing="10">
+            <TextField fx:id="searchBookInput" promptText="Search Books"/>
+            <Button text="Search" onAction="#handleSearchBooks"/>
+        </HBox>
+        <TableView fx:id="bookTable" prefHeight="400.0" prefWidth="900.0">
+            <columns>
+                <TableColumn fx:id="titleColumn" text="Title" prefWidth="180.0"/>
+                <TableColumn fx:id="authorColumn" text="Author" prefWidth="180.0"/>
+                <TableColumn fx:id="isbnColumn" text="ISBN" prefWidth="180.0"/>
+                <TableColumn fx:id="availabilityColumn" text="Available" prefWidth="180.0"/>
+                <TableColumn fx:id="borrowerColumn" text="Borrower" prefWidth="180.0"/>
+            </columns>
+        </TableView>
+
+        <HBox spacing="10">
+            <TextField fx:id="titleInput" promptText="Book Title"/>
+            <TextField fx:id="authorInput" promptText="Book Author"/>
+            <TextField fx:id="isbnInput" promptText="Book ISBN"/>
+        </HBox>
+        <HBox spacing="10">
+            <Button text="Add Book" onAction="#handleAddBook"/>
+            <Button text="Delete Book" onAction="#handleDeleteBook"/>
+        </HBox>
+    </VBox>
+
+    <!-- User Management View -->
+    <VBox fx:id="userManagementView" spacing="10" layoutX="200" layoutY="70" visible="false">
+        <HBox spacing="10">
+            <TextField fx:id="searchUserInput" promptText="Search Users"/>
+            <Button text="Search" onAction="#handleSearchUsers"/>
+        </HBox>
+        <TableView fx:id="userTable" prefHeight="400.0" prefWidth="450.0">
+            <columns>
+                <TableColumn fx:id="nameColumn" text="Name" prefWidth="225.0"/>
+                <TableColumn fx:id="idColumn" text="ID" prefWidth="225.0"/>
+            </columns>
+        </TableView>
+
+        <!-- ListView to show borrowed books -->
+        <Text text="Borrowed Books:"/>
+        <ListView fx:id="borrowedBooksListView" prefHeight="200.0" prefWidth="450.0"/>
+
+        <HBox spacing="10">
+            <TextField fx:id="nameInput" promptText="User Name"/>
+            <TextField fx:id="idInput" promptText="User ID"/>
+        </HBox>
+        <HBox spacing="10">
+            <Button text="Add User" onAction="#handleAddUser"/>
+            <Button text="Delete User" onAction="#handleDeleteUser"/>
+        </HBox>
     </VBox>
 </AnchorPane>

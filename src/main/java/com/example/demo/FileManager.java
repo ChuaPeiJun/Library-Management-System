@@ -1,34 +1,41 @@
 package com.example.demo;
 
 import java.io.*;
-import java.util.*;
+import java.util.ArrayList;
 
 public class FileManager {
 
-    private static final String BOOKS_CSV = "books.csv";
-    private static final String USERS_CSV = "users.csv";
-
-    // Load book data from CSV
-    public static List<Book> loadBooks() {
-        List<Book> books = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(BOOKS_CSV))) {
+    public static void loadData(Library library, ArrayList<User> users) {
+        try (BufferedReader br = new BufferedReader(new FileReader("books.csv"))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                Book book = new Book(data[0], data[1], data[2], Boolean.parseBoolean(data[3]), data[4]);
-                books.add(book);
+                if (data.length == 5) {  // Ensure there are exactly 5 columns
+                    library.addBook(new Book(data[0], data[1], data[2], Boolean.parseBoolean(data[3]), data[4]));
+                } else {
+                    System.out.println("Skipping invalid book entry: " + line);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return books;
+
+        // Load users from file (implementing CSV loading)
+        try (BufferedReader br = new BufferedReader(new FileReader("users.csv"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] data = line.split(",");
+                users.add(new User(data[0], data[1]));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    // Save book data to CSV
-    public static void saveBooks(List<Book> books) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(BOOKS_CSV))) {
-            for (Book book : books) {
-                bw.write(book.getTitle() + "," + book.getAuthor() + "," + book.getISBN() + "," + book.isAvailable() + "," + book.getBorrowerName());
+    public static void saveBooks(Library library) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("books.csv"))) {
+            for (Book book : library.getBooks()) {
+                bw.write(book.getTitle() + "," + book.getAuthor() + "," + book.getISBN() + "," + book.isAvailable() + "," + book.getBorrower());
                 bw.newLine();
             }
         } catch (IOException e) {
@@ -36,27 +43,10 @@ public class FileManager {
         }
     }
 
-    // Load user data from CSV
-    public static List<User> loadUsers() {
-        List<User> users = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(USERS_CSV))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                User user = new User(data[0], data[1], data[2]);
-                users.add(user);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return users;
-    }
-
-    // Save user data to CSV
-    public static void saveUsers(List<User> users) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(USERS_CSV))) {
+    public static void saveUsers(ArrayList<User> users) {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("users.csv"))) {
             for (User user : users) {
-                bw.write(user.getName() + "," + user.getEmail() + "," + user.getRole());
+                bw.write(user.getName() + "," + user.getId());
                 bw.newLine();
             }
         } catch (IOException e) {
