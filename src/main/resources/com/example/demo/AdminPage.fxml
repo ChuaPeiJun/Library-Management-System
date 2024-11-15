@@ -6,7 +6,7 @@
 
 <AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.demo.AdminController">
     <!-- Admin Management Text -->
-    <Text text="Admin Management Page" layoutX="1200" layoutY="800" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+    <Text text="Admin Management Page" layoutX="150" layoutY="50" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
 
     <!-- Admin Actions VBox -->
     <VBox spacing="15" layoutX="150" layoutY="100">
