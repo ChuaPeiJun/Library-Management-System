@@ -42,7 +42,7 @@ public class UserController {
     private void handleBackButton() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("homepage.fxml"));
-            Scene homepageScene = new Scene(loader.load(), 600, 400);
+            Scene homepageScene = new Scene(loader.load(), 1200, 800);
             Stage stage = (Stage) backButton.getScene().getWindow();
             stage.setScene(homepageScene);
             stage.setTitle("Homepage");

@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.demo.LibraryAppController">
+<AnchorPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: lightyellow;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.LibraryAppController">
     <!-- Welcome Text -->
-    <Text text="Welcome to Library Management System" layoutX="100" layoutY="50" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+    <Text layoutX="155.0" layoutY="315.0" style="-fx-font-size: 48px; -fx-font-weight: bold;" text="Welcome to Library Management System" />
 
     <!-- Role Selection Text -->
-    <Text text="Please select your role" layoutX="150" layoutY="100" style="-fx-font-size: 18px;"/>
+    <Text layoutX="473.0" layoutY="435.0" style="-fx-font-size: 26px;" text="Please select your role" />
 
     <!-- Role Selection VBox -->
-    <VBox spacing="20" layoutX="150" layoutY="150">
-        <Button fx:id="adminButton" text="Admin" onAction="#handleAdminButton"/>
-        <Button fx:id="userButton" text="User" onAction="#handleUserButton"/>
-    </VBox>
+    <VBox layoutX="150" layoutY="150" spacing="20" />
+     <Button fx:id="userButton" layoutX="709.0" layoutY="514.0" onAction="#handleUserButton" prefHeight="150.0" prefWidth="200.0" text="User">
+      <font>
+         <Font size="20.0" />
+      </font>
+   </Button>
+     <Button fx:id="adminButton" layoutX="288.0" layoutY="514.0" onAction="#handleAdminButton" prefHeight="150.0" prefWidth="200.0" text="Admin">
+      <font>
+         <Font size="20.0" />
+      </font>
+   </Button>
 </AnchorPane>

@@ -13,7 +13,7 @@ public class LibraryApp extends Application {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("HomePage.fxml"));
             AnchorPane root = loader.load();
-            Scene scene = new Scene(root, 600, 400);
+            Scene scene = new Scene(root, 1200, 800);
             primaryStage.setScene(scene);
             primaryStage.setTitle("Library Management System");
             primaryStage.show();

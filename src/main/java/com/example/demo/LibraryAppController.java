@@ -20,7 +20,7 @@ public class LibraryAppController {
     private void handleAdminButton() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("AdminPage.fxml"));
-            Scene adminScene = new Scene(loader.load(), 600, 400);
+            Scene adminScene = new Scene(loader.load(), 1200, 800);
             Stage stage = (Stage) adminButton.getScene().getWindow();
             stage.setScene(adminScene);
             stage.setTitle("Admin Management Page");
@@ -34,7 +34,7 @@ public class LibraryAppController {
     private void handleUserButton() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("UserPage.fxml"));
-            Scene userScene = new Scene(loader.load(), 600, 400);
+            Scene userScene = new Scene(loader.load(), 1200, 800);
             Stage stage = (Stage) userButton.getScene().getWindow();
             stage.setScene(userScene);
             stage.setTitle("User Management Page");
