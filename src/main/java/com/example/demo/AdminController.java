@@ -5,14 +5,20 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class AdminController {
 
+    @FXML
+    private Button backButton;
     @FXML
     private Button manageBooksButton;
     @FXML
@@ -57,7 +63,6 @@ public class AdminController {
     @FXML
     private ListView<String> borrowedBooksListView;
 
-
     private Library library = new Library();
     private ArrayList<User> users = new ArrayList<>();
 
@@ -71,6 +76,8 @@ public class AdminController {
         System.out.println("Users loaded: " + users.size());
 
         // Initialize book table columns
+        userManagementView.setVisible(false);
+        bookManagementView.setVisible(false);
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
         isbnColumn.setCellValueFactory(new PropertyValueFactory<>("ISBN"));
@@ -83,15 +90,29 @@ public class AdminController {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         userTable.setItems(FXCollections.observableArrayList(users));
 
-        // Add row selection listener for user table to display borrowed books
-        userTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                displayBorrowedBooks(newSelection);
+        // Add selection listener to userTable
+        userTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                displayBorrowedBooks(newValue);
             }
         });
 
         System.out.println("Books in table: " + bookTable.getItems().size());
         System.out.println("Users in table: " + userTable.getItems().size());
+    }
+
+    // Handle Back to Homepage button click
+    @FXML
+    private void handleBackButton() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("homepage.fxml"));
+            Scene homepageScene = new Scene(loader.load(), 1200, 800);
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            stage.setScene(homepageScene);
+            stage.setTitle("Homepage");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -200,11 +221,18 @@ public class AdminController {
 
     @FXML
     private void displayBorrowedBooks(User user) {
-        ObservableList<String> borrowedBooks = FXCollections.observableArrayList();
-        for (Book book : user.getBorrowedBooks()) {
-            borrowedBooks.add(book.getTitle());
+        borrowedBooksListView.getItems().clear(); // Clear existing items
+        boolean hasBorrowedBooks = false;
+        for (Book book : library.getBooks()) {
+            if (user.getName().equals(book.getBorrower())) {
+                String bookDetails = String.format("Title: %s, Author: %s, ISBN: %s", book.getTitle(), book.getAuthor(), book.getISBN());
+                borrowedBooksListView.getItems().add(bookDetails);
+                hasBorrowedBooks = true;
+            }
         }
-        borrowedBooksListView.setItems(borrowedBooks);
+        if (!hasBorrowedBooks) {
+            borrowedBooksListView.getItems().add("No books borrowed");
+        }
     }
 
     private void showAlert(Alert.AlertType type, String title, String message) {

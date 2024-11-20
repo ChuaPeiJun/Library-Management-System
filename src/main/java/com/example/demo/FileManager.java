@@ -10,8 +10,9 @@ public class FileManager {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] data = line.split(",");
-                if (data.length == 5) {  // Ensure there are exactly 5 columns
-                    library.addBook(new Book(data[0], data[1], data[2], Boolean.parseBoolean(data[3]), data[4]));
+                if (data.length == 4 || data.length == 5) {  // Ensure there are either 4 or 5 columns
+                    String borrower = data.length == 5 ? data[4] : "";
+                    library.addBook(new Book(data[0], data[1], data[2], Boolean.parseBoolean(data[3]), borrower));
                 } else {
                     System.out.println("Skipping invalid book entry: " + line);
                 }
