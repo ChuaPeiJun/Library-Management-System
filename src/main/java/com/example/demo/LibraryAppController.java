@@ -8,6 +8,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
 import javafx.fxml.FXMLLoader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Optional;
 
 public class LibraryAppController {
@@ -19,6 +20,15 @@ public class LibraryAppController {
     private Button userButton;
 
     private static final String ADMIN_PASSWORD = "123456"; // Define your password here
+
+    private Library library = new Library();
+    private ArrayList<User> users = new ArrayList<>();
+
+    // Initialize method to load users from the file
+    public void initialize() {
+        // Assuming FileManager.loadData is the method that loads users from a file
+        FileManager.loadData(library, users);
+    }
 
     // Handle Admin button click: Redirect to Admin Page
     @FXML
@@ -53,23 +63,60 @@ public class LibraryAppController {
         }
     }
 
-    // Method to handle successful admin access
-    private void accessAdminPage() {
-        // Add your redirection logic here
-        System.out.println("Access granted to admin page.");
-    }
-
     // Handle User button click: Redirect to User Page
     @FXML
     private void handleUserButton() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("UserPage.fxml"));
-            Scene userScene = new Scene(loader.load(), 1200, 800);
-            Stage stage = (Stage) userButton.getScene().getWindow();
-            stage.setScene(userScene);
-            stage.setTitle("User Management Page");
-        } catch (IOException e) {
-            e.printStackTrace();
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("User Login");
+        dialog.setHeaderText("Please enter your User ID");
+        dialog.setContentText("User ID:");
+
+        Optional<String> result = dialog.showAndWait();
+        if (result.isPresent()) {
+            String userId = result.get().trim();
+
+            if (!userId.isEmpty()) {
+                // Find the user by ID
+                User foundUser = users.stream()
+                        .filter(user -> user.getId().equals(userId))
+                        .findFirst()
+                        .orElse(null);
+
+                if (foundUser != null) {
+                    try {
+                        // Set the current user
+                        UserManager.setCurrentUser(foundUser);
+
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("UserPage.fxml"));
+                        Scene userScene = new Scene(loader.load(), 1200, 800);
+
+                        Stage stage = (Stage) userButton.getScene().getWindow();
+                        stage.setScene(userScene);
+                        stage.setTitle("User Management Page");
+                    } catch (IOException e) {
+                        System.err.println("Error loading UserPage.fxml: " + e.getMessage());
+                        e.printStackTrace();
+
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error");
+                        alert.setHeaderText("Page Load Failed");
+                        alert.setContentText("There was an issue loading the User Management Page. Please try again.");
+                        alert.showAndWait();
+                    }
+                } else {
+                    Alert alert = new Alert(Alert.AlertType.ERROR);
+                    alert.setTitle("Authentication Failed");
+                    alert.setHeaderText("User Not Found");
+                    alert.setContentText("The User ID you entered is not found. Please try again.");
+                    alert.showAndWait();
+                }
+            } else {
+                Alert alert = new Alert(Alert.AlertType.WARNING);
+                alert.setTitle("Invalid Input");
+                alert.setHeaderText("User ID Cannot Be Empty");
+                alert.setContentText("Please enter a valid User ID.");
+                alert.showAndWait();
+            }
         }
     }
 }
