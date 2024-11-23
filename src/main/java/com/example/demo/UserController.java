@@ -194,6 +194,7 @@ public class UserController {
             selectedBook.setBorrower(currentUser.getName());
             selectedBook.setBorrowDate(now);
             selectedBook.setReturnDate(now.plusDays(7)); // 7-day borrowing period
+            bookTable.refresh();//update the UI with the latest changes
 
             FileManager.saveBooks(library);
             initializeBookTables();
@@ -233,6 +234,7 @@ public class UserController {
 
             FileManager.saveBooks(library); // Save changes to the CSV
             initializeBookTables();
+            bookTable.refresh();
 
             showAlert(Alert.AlertType.INFORMATION, "Book Returned",
                     "You have successfully returned the book: " + selectedBook.getTitle());

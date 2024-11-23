@@ -6,7 +6,6 @@ public class UserManager {
     public static void setCurrentUser(User user) {
         currentUser = user;
     }
-
     public static User getCurrentUser() {
         if (currentUser == null) {
             // Provide a default user or throw an exception
@@ -14,7 +13,6 @@ public class UserManager {
         }
         return currentUser;
     }
-
     // Optional: method to clear current user
     public static void clearCurrentUser() {
         currentUser = null;
