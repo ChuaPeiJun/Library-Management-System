@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -20,6 +21,12 @@ import java.util.stream.Collectors;
 
 public class UserController {
 
+    @FXML
+    private StackPane mainContent;
+    @FXML
+    private Button viewBorrowedBooksButton;
+    @FXML
+    private Button borrowBookButton;
     @FXML
     private TextField searchBookInput;
 
