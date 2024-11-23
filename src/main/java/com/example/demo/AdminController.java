@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class AdminController {
@@ -249,17 +250,17 @@ public class AdminController {
 
     @FXML
     private void displayBorrowedBooks(User user) {
-        borrowedBooksListView.getItems().clear(); // Clear existing items
-        boolean hasBorrowedBooks = false;
-        for (Book book : library.getBooks()) {
-            if (user.getName().equals(book.getBorrower())) {
-                String bookDetails = String.format("Title: %s, Author: %s, ISBN: %s", book.getTitle(), book.getAuthor(), book.getISBN());
-                borrowedBooksListView.getItems().add(bookDetails);
-                hasBorrowedBooks = true;
-            }
-        }
-        if (!hasBorrowedBooks) {
+        borrowedBooksListView.getItems().clear();
+        List<Book> borrowedBooks = library.getBooks().stream()
+                .filter(book -> book.getBorrower() != null && book.getBorrower().equals(user.getName()))
+                .collect(Collectors.toList());
+        if (borrowedBooks.isEmpty()) {
             borrowedBooksListView.getItems().add("No books borrowed");
+        } else {
+            for (Book book : borrowedBooks) {
+                String bookDetails = String.format("Title: %s, Author: %s, ISBN: %s, Returned Date: %s", book.getTitle(), book.getAuthor(), book.getISBN(),book.getReturnDate());
+                borrowedBooksListView.getItems().add(bookDetails);
+            }
         }
     }
 
@@ -269,30 +270,29 @@ public class AdminController {
                 new ReadOnlyStringWrapper(data.getValue().getBorrower()));
         borrowDateColumn.setCellValueFactory(data ->
                 new ReadOnlyStringWrapper(data.getValue().getBorrowDate() != null
-                        ? data.getValue().getBorrowDate().toString()
-                        : ""));
+                        ? data.getValue().getBorrowDate().toString() : ""));
         returnDateColumn.setCellValueFactory(data ->
                 new ReadOnlyStringWrapper(data.getValue().getReturnDate() != null
-                        ? data.getValue().getReturnDate().toString()
-                        : ""));
+                        ? data.getValue().getReturnDate().toString() : ""));
         fineColumn.setCellValueFactory(data -> {
             LocalDate returnDate = data.getValue().getReturnDate();
-            if (returnDate != null) {
+            if (returnDate != null && LocalDate.now().isAfter(returnDate)) {
                 long daysOverdue = ChronoUnit.DAYS.between(returnDate, LocalDate.now());
-                double fine = daysOverdue > 0 ? daysOverdue * 1.0 : 0;
+                double fine = daysOverdue * 1.0;
                 return new ReadOnlyStringWrapper("$" + fine);
             }
             return new ReadOnlyStringWrapper("$0");
         });
     }
 
+
     private void initializeBorrowedBooksTable() {
-        ObservableList<Book> borrowedBooks = FXCollections.observableArrayList(
+        ObservableList<Book> overdueBooks = FXCollections.observableArrayList(
                 library.getBooks().stream()
-                        .filter(book -> book.getBorrower() != null)
+                        .filter(book -> book.getReturnDate() != null && LocalDate.now().isAfter(book.getReturnDate()))
                         .collect(Collectors.toList())
         );
-        borrowedBooksTable.setItems(borrowedBooks);
+        borrowedBooksTable.setItems(overdueBooks);
     }
 
     @FXML
@@ -305,48 +305,37 @@ public class AdminController {
     }
 
     @FXML
-    private void handleReturnBook() {
-        Book selectedBook = borrowedBooksTable.getSelectionModel().getSelectedItem();
-        if (selectedBook != null) {
-            LocalDate now = LocalDate.now();
-            LocalDate returnDate = selectedBook.getReturnDate();
-
-            long daysOverdue = ChronoUnit.DAYS.between(returnDate, now);
-            double fine = daysOverdue > 0 ? daysOverdue * 1.0 : 0;
-
-            selectedBook.setAvailable(true);
-            selectedBook.setBorrower(null);
-            selectedBook.setBorrowDate(null);
-            selectedBook.setReturnDate(null);
-
-            FileManager.saveBooks(library);
-            initializeBorrowedBooksTable();
-
-            showAlert(Alert.AlertType.INFORMATION, "Book Returned",
-                    "The book '" + selectedBook.getTitle() + "' has been returned." +
-                            "\nFine: $" + fine);
-        } else {
-            showAlert(Alert.AlertType.WARNING, "Return Book", "Please select a book to return.");
-        }
-    }
-
-    @FXML
     private void handleRenewBook() {
         Book selectedBook = borrowedBooksTable.getSelectionModel().getSelectedItem();
         if (selectedBook != null) {
             LocalDate now = LocalDate.now();
-
-            selectedBook.setReturnDate(now.plusDays(7));
-
-            FileManager.saveBooks(library);
-            initializeBorrowedBooksTable();
-
+            selectedBook.setReturnDate(now.plusDays(7)); // Update return date
+            FileManager.saveBooks(library); // Save updates to the CSV
+            initializeBorrowedBooksTable(); // Refresh table
             showAlert(Alert.AlertType.INFORMATION, "Book Renewed",
                     "The book '" + selectedBook.getTitle() + "' has been renewed for 7 days starting today.");
         } else {
             showAlert(Alert.AlertType.WARNING, "Renew Book", "Please select a book to renew.");
         }
     }
+
+    @FXML
+    private void handleReturnBook() {
+        Book selectedBook = borrowedBooksTable.getSelectionModel().getSelectedItem();
+        if (selectedBook != null) {
+            selectedBook.setAvailable(true);
+            selectedBook.setBorrower(null);
+            selectedBook.setBorrowDate(null);
+            selectedBook.setReturnDate(null); // Reset return date
+            FileManager.saveBooks(library); // Save updates to the CSV
+            initializeBorrowedBooksTable(); // Refresh table
+            showAlert(Alert.AlertType.INFORMATION, "Book Returned",
+                    "The book '" + selectedBook.getTitle() + "' has been returned.");
+        } else {
+            showAlert(Alert.AlertType.WARNING, "Return Book", "Please select a book to return.");
+        }
+    }
+
 
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
