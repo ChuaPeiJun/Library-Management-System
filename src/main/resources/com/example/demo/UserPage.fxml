@@ -54,6 +54,7 @@
                     </columns>
                 </TableView>
                 <Button fx:id="returnSelectedBookButton" text="Return Selected Book" onAction="#handleReturnBook" />
+                <Button fx:id="renewSelectedBookButton" text="Renew Selected Book" onAction="#handleRenewBook" />
             </VBox>
         </StackPane>
     </center>

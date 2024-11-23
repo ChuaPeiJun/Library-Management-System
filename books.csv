@@ -1,12 +1,12 @@
-To Kill a Mockingbird,Harper Lee,9780061120084,false,John Doe
-Moby Dick,Herman Melville,9781503280786,false,Jane Smith
-Pride and Prejudice,Jane Austen,9781503290563,false,Sam Wilson
-The Lord of the Rings,J.R.R. Tolkien,9780544003415,false,Mary Johnson
-Crime and Punishment,Fyodor Dostoevsky,9780486415871,false,Peter Parker
-1984,George Orwell,9780451524935,true,
-The Great Gatsby,F. Scott Fitzgerald,9780743273565,true,
-Harry Potter and the Sorcerer's Stone,J.K. Rowling,9780439708180,true,
-The Catcher in the Rye,J.D. Salinger,9780316769488,true,
-The Hobbit,J.R.R. Tolkien,9780345339683,false,Bruce Wayne
-War and Peace,Leo Tolstoy,9781400079988,true,
-The Odyssey,Homer,9780140268867,true,
+Title,Author,ISBN,Available,Borrower,BorrowDate,ReturnDate
+Moby Dick,Herman Melville,9781503280786,false,Jane Smith,2024-11-20,2024-11-27
+Pride and Prejudice,Jane Austen,9781503290563,false,Sam Wilson,2024-11-20,2024-11-27
+The Lord of the Rings,J.R.R. Tolkien,9780544003415,false,Mary Johnson,2024-11-20,2024-11-27
+Crime and Punishment,Fyodor Dostoevsky,9780486415871,false,Peter Parker,2024-11-20,2024-11-27
+1984,George Orwell,9780451524935,true,,,
+The Great Gatsby,F. Scott Fitzgerald,9780743273565,true,,,
+Harry Potter and the Sorcerer's Stone,J.K. Rowling,9780439708180,true,,,
+The Catcher in the Rye,J.D. Salinger,9780316769488,true,,,
+The Hobbit,J.R.R. Tolkien,9780345339683,false,Bruce Wayne,2024-11-20,2024-11-30
+War and Peace,Leo Tolstoy,9781400079988,false,John Doe,2024-11-23,2024-11-30
+The Odyssey,Homer,9780140268867,true,,,

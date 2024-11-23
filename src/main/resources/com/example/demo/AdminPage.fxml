@@ -10,6 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
+<?import javafx.scene.control.cell.PropertyValueFactory?>
 <AnchorPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: linear-gradient(to bottom, #d7e8f7, #b0d3f0);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.AdminController">
     <Text layoutX="20" layoutY="30" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Admin Management Page" />
 
@@ -17,6 +18,7 @@
         <Button fx:id="backButton" onAction="#handleBackButton" style="-fx-font-size: 16px; -fx-background-color: #3b5998; -fx-text-fill: white;" text="Back to Homepage" />
         <Button fx:id="manageBooksButton" onAction="#handleManageBooks" prefHeight="100.0" prefWidth="155.5" style="-fx-font-size: 16px; -fx-background-color: #8b9dc3; -fx-text-fill: white;" text="Manage Books" />
         <Button fx:id="manageUsersButton" onAction="#handleManageUsers" prefHeight="100.0" prefWidth="155.5" style="-fx-font-size: 16px; -fx-background-color: #8b9dc3; -fx-text-fill: white;" text="Manage Users" />
+        <Button fx:id="manageLateReturnBooksButton" onAction="#handleManageLateReturnBooks" prefHeight="100.0" prefWidth="155.5" style="-fx-font-size: 16px; -fx-background-color: #8b9dc3; -fx-text-fill: white;" text="Manage Late Returns" />
     </VBox>
 
     <!-- Book Management View -->
@@ -34,15 +36,23 @@
                 <TableColumn fx:id="borrowerColumn" prefWidth="180.0" text="Borrower" />
             </columns>
         </TableView>
+    </VBox>
+
+    <!-- Late Return Books Management -->
+    <VBox fx:id="lateReturnBooksView" layoutX="200" layoutY="70" spacing="10" visible="false">
+        <TableView fx:id="borrowedBooksTable" prefHeight="400.0" prefWidth="900.0" style="-fx-background-color: #f3f3f3;">
+            <columns>
+                <TableColumn fx:id="borrowedTitleColumn" prefWidth="180.0" text="Title" />
+                <TableColumn fx:id="borrowerNameColumn" prefWidth="180.0" text="Borrower" />
+                <TableColumn fx:id="borrowDateColumn" prefWidth="180.0" text="Borrow Date" />
+                <TableColumn fx:id="returnDateColumn" prefWidth="180.0" text="Return Date" />
+                <TableColumn fx:id="fineColumn" prefWidth="180.0" text="Fine" />
+            </columns>
+        </TableView>
 
         <HBox spacing="10">
-            <TextField fx:id="titleInput" promptText="Book Title" style="-fx-background-color: white; -fx-padding: 10px;" />
-            <TextField fx:id="authorInput" promptText="Book Author" style="-fx-background-color: white; -fx-padding: 10px;" />
-            <TextField fx:id="isbnInput" promptText="Book ISBN" style="-fx-background-color: white; -fx-padding: 10px;" />
-        </HBox>
-        <HBox spacing="10">
-            <Button onAction="#handleAddBook" style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;" text="Add Book" />
-            <Button onAction="#handleDeleteBook" style="-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;" text="Delete Book" />
+            <Button fx:id="renewBookButton" onAction="#handleRenewBook" style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;" text="Renew Book" />
+            <Button fx:id="returnBookButton" onAction="#handleReturnBook" style="-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;" text="Return Book" />
         </HBox>
     </VBox>
 
@@ -73,4 +83,5 @@
             <Button onAction="#handleDeleteUser" style="-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;" text="Delete User" />
         </HBox>
     </VBox>
+
 </AnchorPane>

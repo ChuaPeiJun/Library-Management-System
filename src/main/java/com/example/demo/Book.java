@@ -8,17 +8,17 @@ public class Book {
     private String ISBN;
     private boolean available;
     private String borrower;
-    private LocalDate borrowDate; // Date when the book was borrowed
-    private LocalDate returnDate; // Due date for returning the book
+    private LocalDate borrowDate;
+    private LocalDate returnDate;
 
-    public Book(String title, String author, String ISBN, boolean available, String borrower) {
+    public Book(String title, String author, String ISBN, boolean available, String borrower, LocalDate borrowDate, LocalDate returnDate) {
         this.title = title;
         this.author = author;
         this.ISBN = ISBN;
         this.available = available;
         this.borrower = borrower;
-        this.borrowDate = null;
-        this.returnDate = null;
+        this.borrowDate = borrowDate;
+        this.returnDate = returnDate;
     }
 
     // Getters and setters
@@ -30,33 +30,30 @@ public class Book {
     public LocalDate getBorrowDate() { return borrowDate; }
     public LocalDate getReturnDate() { return returnDate; }
 
-    public void setTitle(String title) { this.title = title; }
-    public void setAuthor(String author) { this.author = author; }
-    public void setISBN(String ISBN) { this.ISBN = ISBN; }
     public void setAvailable(boolean available) { this.available = available; }
     public void setBorrower(String borrower) { this.borrower = borrower; }
     public void setBorrowDate(LocalDate borrowDate) { this.borrowDate = borrowDate; }
     public void setReturnDate(LocalDate returnDate) { this.returnDate = returnDate; }
 
-    // Check if the book is overdue and calculate the fine
+    // Check if the book is overdue
     public boolean isOverdue() {
-        if (returnDate == null || LocalDate.now().isBefore(returnDate)) {
-            return false;
-        }
-        return true;
+        return returnDate != null && LocalDate.now().isAfter(returnDate);
     }
 
+    // Calculate fine for overdue books
     public double calculateFine() {
         if (!isOverdue()) return 0.0;
-
-        long overdueDays = LocalDate.now().toEpochDay() - returnDate.toEpochDay();
-        return overdueDays * 1.0; // Fine: $1.00 per day
+        long daysOverdue = LocalDate.now().toEpochDay() - returnDate.toEpochDay();
+        return daysOverdue * 1.0; // $1.00 fine per day
     }
 
-    // Renew the book (extend the return date by 7 days)
-    public void renew() {
+    // Renew the book (extend return date by 7 days if not overdue)
+    public boolean renew() {
+        if (isOverdue()) return false; // Cannot renew overdue books
         if (returnDate != null) {
             returnDate = returnDate.plusDays(7);
+            return true;
         }
+        return false;
     }
 }

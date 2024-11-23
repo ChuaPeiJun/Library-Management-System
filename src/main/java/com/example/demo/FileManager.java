@@ -1,46 +1,74 @@
 package com.example.demo;
 
 import java.io.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 public class FileManager {
 
-    public static void loadData(Library library, ArrayList<User> users) {
-        try (BufferedReader br = new BufferedReader(new FileReader("books.csv"))) {
+    private static final String BOOKS_FILE = "books.csv";
+
+    // Load books from the CSV file into the library
+    public static void loadData(Library library) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(BOOKS_FILE))) {
+            String line = reader.readLine(); // Skip header row
+            while ((line = reader.readLine()) != null) {
+                String[] fields = line.split(",", -1);
+                String title = fields[0];
+                String author = fields[1];
+                String isbn = fields[2];
+                boolean available = Boolean.parseBoolean(fields[3]);
+                String borrower = fields[4];
+                LocalDate borrowDate = fields[5].isEmpty() ? null : LocalDate.parse(fields[5]);
+                LocalDate returnDate = fields[6].isEmpty() ? null : LocalDate.parse(fields[6]);
+
+                Book book = new Book(title, author, isbn, available, borrower, borrowDate, returnDate);
+                library.addBook(book);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Error loading data from " + BOOKS_FILE);
+        }
+    }
+    public static void loadUsers(ArrayList<User> users) {
+        try (BufferedReader reader = new BufferedReader(new FileReader("users.csv"))) {
             String line;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                if (data.length == 4 || data.length == 5) {  // Ensure there are either 4 or 5 columns
-                    String borrower = data.length == 5 ? data[4] : "";
-                    library.addBook(new Book(data[0], data[1], data[2], Boolean.parseBoolean(data[3]), borrower));
-                } else {
-                    System.out.println("Skipping invalid book entry: " + line);
+            while ((line = reader.readLine()) != null) {
+                String[] fields = line.split(",", -1);
+                if (fields.length >= 2) {
+                    String name = fields[0];
+                    String id = fields[1];
+                    User user = new User(name, id);
+                    users.add(user);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-
-        // Load users from file (implementing CSV loading)
-        try (BufferedReader br = new BufferedReader(new FileReader("users.csv"))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] data = line.split(",");
-                users.add(new User(data[0], data[1]));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error loading users from users.csv");
         }
     }
 
+
+    // Save the updated list of books back to the CSV file
     public static void saveBooks(Library library) {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("books.csv"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(BOOKS_FILE))) {
+            writer.write("Title,Author,ISBN,Available,Borrower,BorrowDate,ReturnDate");
+            writer.newLine();
             for (Book book : library.getBooks()) {
-                bw.write(book.getTitle() + "," + book.getAuthor() + "," + book.getISBN() + "," + book.isAvailable() + "," + book.getBorrower());
-                bw.newLine();
+                writer.write(String.format("%s,%s,%s,%b,%s,%s,%s",
+                        book.getTitle(),
+                        book.getAuthor(),
+                        book.getISBN(),
+                        book.isAvailable(),
+                        book.getBorrower() != null ? book.getBorrower() : "",
+                        book.getBorrowDate() != null ? book.getBorrowDate().toString() : "",
+                        book.getReturnDate() != null ? book.getReturnDate().toString() : ""));
+                writer.newLine();
             }
         } catch (IOException e) {
             e.printStackTrace();
+            System.err.println("Error saving data to " + BOOKS_FILE);
         }
     }
 
@@ -51,7 +79,7 @@ public class FileManager {
                 bw.newLine();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Error saving users: " + e.getMessage());
         }
     }
 }

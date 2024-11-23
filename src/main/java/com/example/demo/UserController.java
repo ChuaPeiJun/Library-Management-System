@@ -48,6 +48,10 @@ public class UserController {
     @FXML
     private Button returnSelectedBookButton;
     @FXML
+    private Button renewSelectedBookButton;
+    @FXML
+    private Button backToHomepageButton;
+    @FXML
     private Label usernameLabel;
     @FXML
     private VBox borrowBookView;
@@ -67,8 +71,8 @@ public class UserController {
     @FXML
     public void initialize() {
         // Load data
-        FileManager.loadData(library, users);
-
+        FileManager.loadData(library);
+        FileManager.loadUsers(users);
         // Set up book table columns
         setupBookTableColumns();
 
@@ -101,8 +105,15 @@ public class UserController {
 
     @FXML
     private void handleBackToHomepage() {
-        showAlert(Alert.AlertType.INFORMATION, "Back to Homepage", "Returning to the homepage...");
-        // Implement navigation logic, e.g., loading the homepage scene
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("homepage.fxml"));
+            Scene homepageScene = new Scene(loader.load(), 1200, 800);
+            Stage stage = (Stage) backToHomepageButton.getScene().getWindow();
+            stage.setScene(homepageScene);
+            stage.setTitle("Homepage");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void retrieveCurrentUser() {
@@ -133,7 +144,6 @@ public class UserController {
         isbnColumn.setCellValueFactory(new PropertyValueFactory<>("ISBN"));
         availabilityColumn.setCellValueFactory(data ->
                 new ReadOnlyStringWrapper(data.getValue().isAvailable() ? "Yes" : "No"));
-
         borrowedTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         borrowedISBNColumn.setCellValueFactory(new PropertyValueFactory<>("ISBN"));
         borrowedStatusColumn.setCellValueFactory(data ->
@@ -145,19 +155,14 @@ public class UserController {
     }
 
     private void initializeBookTables() {
-        // All books table
         allBooks = FXCollections.observableArrayList(library.getBooks());
         bookTable.setItems(allBooks);
-
-        // Borrowed books table
         borrowedBooks = FXCollections.observableArrayList(
                 library.getBooks().stream()
-                        .filter(book -> book.getBorrower() != null && book.getBorrower().equals(currentUser.getId()))
+                        .filter(book -> book.getBorrower() != null && book.getBorrower().equals(currentUser.getName()))
                         .collect(Collectors.toList())
         );
         borrowedBooksTable.setItems(borrowedBooks);
-
-        // Disable borrow/return buttons if no book is selected
         borrowSelectedBookButton.disableProperty().bind(bookTable.getSelectionModel().selectedItemProperty().isNull());
         returnSelectedBookButton.disableProperty().bind(borrowedBooksTable.getSelectionModel().selectedItemProperty().isNull());
     }
@@ -179,7 +184,7 @@ public class UserController {
         if (selectedBook != null && selectedBook.isAvailable()) {
             LocalDate now = LocalDate.now();
             selectedBook.setAvailable(false);
-            selectedBook.setBorrower(currentUser.getId());
+            selectedBook.setBorrower(currentUser.getName());
             selectedBook.setBorrowDate(now);
             selectedBook.setReturnDate(now.plusDays(7)); // 7-day borrowing period
 
@@ -198,22 +203,28 @@ public class UserController {
     @FXML
     private void handleReturnBook() {
         Book selectedBook = borrowedBooksTable.getSelectionModel().getSelectedItem();
-        if (selectedBook != null && selectedBook.getBorrower().equals(currentUser.getId())) {
+        if (selectedBook != null && selectedBook.getBorrower() != null &&
+                selectedBook.getBorrower().equals(currentUser.getName())) { // Match name
             LocalDate now = LocalDate.now();
-            long daysOverdue = ChronoUnit.DAYS.between(selectedBook.getReturnDate(), now);
+            LocalDate returnDate = selectedBook.getReturnDate();
 
-            if (daysOverdue > 0) {
+            if (now.isAfter(returnDate)) { // Check for overdue
+                long daysOverdue = ChronoUnit.DAYS.between(returnDate, now);
                 double fine = daysOverdue * 1.0; // $1 per day overdue
+
                 showAlert(Alert.AlertType.WARNING, "Late Return",
-                        "The book is " + daysOverdue + " days overdue. You owe a fine of $" + fine + ".");
+                        "The book is overdue by " + daysOverdue + " days. Please settle a fine of $" + fine +
+                                " with the library before returning.");
+                return; // Prevent returning the book
             }
 
+            // Update book details to mark as returned
             selectedBook.setAvailable(true);
             selectedBook.setBorrower(null);
             selectedBook.setBorrowDate(null);
             selectedBook.setReturnDate(null);
 
-            FileManager.saveBooks(library);
+            FileManager.saveBooks(library); // Save changes to the CSV
             initializeBookTables();
 
             showAlert(Alert.AlertType.INFORMATION, "Book Returned",
@@ -227,28 +238,35 @@ public class UserController {
     @FXML
     private void handleRenewBook() {
         Book selectedBook = borrowedBooksTable.getSelectionModel().getSelectedItem();
-        if (selectedBook != null && selectedBook.getBorrower().equals(currentUser.getId())) {
+        if (selectedBook != null && selectedBook.getBorrower() != null &&
+                selectedBook.getBorrower().equals(currentUser.getName())) { // Match name
             LocalDate now = LocalDate.now();
             LocalDate returnDate = selectedBook.getReturnDate();
 
-            if (returnDate.isBefore(now)) {
+            if (now.isAfter(returnDate)) { // Check for overdue
                 long daysOverdue = ChronoUnit.DAYS.between(returnDate, now);
                 double fine = daysOverdue * 1.0; // $1 per day overdue
-                showAlert(Alert.AlertType.WARNING, "Renewal Denied",
-                        "The book is " + daysOverdue + " days overdue. You owe a fine of $" + fine + ". Return the book first.");
-            } else {
-                selectedBook.setReturnDate(returnDate.plusDays(7)); // Extend by 7 days
-                FileManager.saveBooks(library);
-                initializeBookTables();
 
-                showAlert(Alert.AlertType.INFORMATION, "Book Renewed",
-                        "The return date has been extended to: " + selectedBook.getReturnDate());
+                showAlert(Alert.AlertType.WARNING, "Renewal Denied",
+                        "The book is overdue by " + daysOverdue + " days. Please settle a fine of $" + fine +
+                                " with the library before renewing.");
+                return; // Prevent renewing the book
             }
+
+            // Extend return date by 7 days
+            selectedBook.setReturnDate(returnDate.plusDays(7));
+            FileManager.saveBooks(library); // Save changes to the CSV
+            initializeBookTables();
+
+            showAlert(Alert.AlertType.INFORMATION, "Book Renewed",
+                    "The return date for '" + selectedBook.getTitle() + "' has been extended to: " + selectedBook.getReturnDate());
         } else {
             showAlert(Alert.AlertType.WARNING, "Renew Book",
                     "Please select a borrowed book to renew.");
         }
     }
+
+
 
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);

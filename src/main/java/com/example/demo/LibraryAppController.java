@@ -27,7 +27,8 @@ public class LibraryAppController {
     // Initialize method to load users from the file
     public void initialize() {
         // Assuming FileManager.loadData is the method that loads users from a file
-        FileManager.loadData(library, users);
+        FileManager.loadData(library);
+        FileManager.loadUsers(users);
     }
 
     // Handle Admin button click: Redirect to Admin Page
