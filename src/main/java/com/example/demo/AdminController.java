@@ -9,6 +9,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -28,6 +29,8 @@ public class AdminController {
     @FXML
     private Button manageUsersButton;
     @FXML
+    private Button manageLateReturnBooksButton;
+    @FXML
     private VBox bookManagementView;
     @FXML
     private VBox userManagementView;
@@ -42,11 +45,14 @@ public class AdminController {
     @FXML
     private TableColumn<Book, String> isbnColumn;
     @FXML
-    private TextField titleInput;
+    private TableColumn<Book, String> availabilityColumn;
     @FXML
-    private TextField authorInput;
+    private TableColumn<Book, String> borrowerColumn;
     @FXML
-    private TextField isbnInput;
+    private TableColumn<Book, String> borrowDateColumn1;
+    @FXML
+    private TableColumn<Book, String> returnDateColumn1;
+
     @FXML
     private TableView<Book> borrowedBooksTable;
     @FXML
@@ -61,76 +67,252 @@ public class AdminController {
     private TableColumn<Book, String> fineColumn;
 
     @FXML
-    private Button returnSelectedBookButton;
-    @FXML
-    private Button renewSelectedBookButton;
-    @FXML
     private TableView<User> userTable;
     @FXML
     private TableColumn<User, String> nameColumn;
     @FXML
     private TableColumn<User, String> idColumn;
-    @FXML
-    private TextField nameInput;
-    @FXML
-    private TextField idInput;
+
     @FXML
     private TextField searchBookInput;
     @FXML
     private TextField searchUserInput;
     @FXML
-    private TableColumn<Book, String> availabilityColumn;
+    private TableView<Book> borrowedBooksTableView;
     @FXML
-    private TableColumn<Book, String> borrowerColumn;
+    private TableColumn<Book, String> bookTitleColumn;
+    @FXML
+    private TableColumn<Book, String> bookAuthorColumn;
+    @FXML
+    private TableColumn<Book, String> bookIsbnColumn;
+    @FXML
+    private TableColumn<Book, String> bookBorrowDateColumn;
+    @FXML
+    private TableColumn<Book, String> bookReturnDateColumn;
+
+
     @FXML
     private ListView<String> borrowedBooksListView;
 
+    private ObservableList<Book> allBooks;
     private Library library = new Library();
     private ArrayList<User> users = new ArrayList<>();
-    private ObservableList<Book> borrowedBooks;
 
     @FXML
     public void initialize() {
-        // Load data from files
+        // Handle the initial view state and management setup
+        handleManageBooks();
+
+        // Enable editing for the book and user tables
+        bookTable.setEditable(true);
+        userTable.setEditable(true);
+
+        // Enable editing for individual columns in both tables
+        titleColumn.setEditable(true);
+        authorColumn.setEditable(true);
+        isbnColumn.setEditable(true);
+
+        nameColumn.setEditable(true);
+        idColumn.setEditable(true);
+
+        // Load data for books and users from files
         FileManager.loadData(library);
         FileManager.loadUsers(users);
 
-        // Debug prints
-        System.out.println("Books loaded: " + library.getBooks().size());
-        System.out.println("Users loaded: " + users.size());
-
-        // Initialize book table columns
-        userManagementView.setVisible(true);
-        bookManagementView.setVisible(false);
+        // Initialize the default view visibility
+        userManagementView.setVisible(false);
+        bookManagementView.setVisible(true);
         lateReturnBooksView.setVisible(false);
+
+        // Set up columns and populate data for the book table
+        initializeBookTable();
+
+        // Set up columns and populate data for the user table
+        initializeUserTable();
+
+        // Setup search functionality for books and users
+        setupSearchFunctionality();
+
+        // Setup tables and UI components for late return books and borrowed books
+        setupLateReturnBooksTable();
+        initializeBorrowedBooksTable();
+
+        // Make book table columns editable and save changes on edit
+        setupEditableBookColumns();
+
+        // Make user table columns editable and save changes on edit
+        setupEditableUserColumns();
+
+        // Initialize borrowed books logic
+        initializeBorrowedBooks();
+    }
+
+    // Method to initialize the book table and its columns
+    private void initializeBookTable() {
+        // Set cell value factories for book table columns
         titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         authorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
         isbnColumn.setCellValueFactory(new PropertyValueFactory<>("ISBN"));
-        availabilityColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().isAvailable() ? "Yes" : "No"));
-        borrowerColumn.setCellValueFactory(data -> new ReadOnlyStringWrapper(data.getValue().getBorrower() == null ? "" : data.getValue().getBorrower()));
-        bookTable.setItems(FXCollections.observableArrayList(library.getBooks()));
 
-        // Initialize user table columns
+        // Availability column logic for displaying "Yes" or "No"
+        availabilityColumn.setCellValueFactory(data ->
+                new ReadOnlyStringWrapper(data.getValue().isAvailable() ? "Yes" : "No")
+        );
+
+        // Borrower column logic to display borrower name or blank
+        borrowerColumn.setCellValueFactory(data ->
+                new ReadOnlyStringWrapper(data.getValue().getBorrower() == null ? "" : data.getValue().getBorrower())
+        );
+
+        // Borrow Date column logic to display the borrow date or blank
+        borrowDateColumn1.setCellValueFactory(data ->
+                new ReadOnlyStringWrapper(data.getValue().getBorrowDate() != null ? data.getValue().getBorrowDate().toString() : "")
+        );
+
+        // Return Date column logic to display the return date or blank
+        returnDateColumn1.setCellValueFactory(data ->
+                new ReadOnlyStringWrapper(data.getValue().getReturnDate() != null ? data.getValue().getReturnDate().toString() : "")
+        );
+
+        // Populate book table with data from the library
+        allBooks = FXCollections.observableArrayList(library.getBooks());
+        bookTable.setItems(allBooks);
+    }
+
+    // Method to initialize the user table and its columns
+    private void initializeUserTable() {
+        // Set cell value factories for user table columns
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+
+        // Populate user table with data
         userTable.setItems(FXCollections.observableArrayList(users));
 
-        // Add selection listener to userTable
+        // Add a selection listener to display borrowed books for the selected user
         userTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 displayBorrowedBooks(newValue);
             }
         });
+    }
 
-        System.out.println("Books in table: " + bookTable.getItems().size());
-        System.out.println("Users in table: " + userTable.getItems().size());
-        setupLateReturnBooksTable();
-        initializeBorrowedBooksTable();
+    // Method to setup search functionality for books and users
+    private void setupSearchFunctionality() {
+        handleSearchBooks(); // Search logic for books
+        handleSearchUsers(); // Search logic for users
+    }
+
+    // Method to setup editable columns in the book table
+    private void setupEditableBookColumns() {
+        // Editable title column
+        titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        titleColumn.setOnEditCommit(event -> {
+            Book selectedBook = event.getRowValue();
+            String oldTitle = selectedBook.getTitle();
+            String newTitle = event.getNewValue();
+
+            // Update the book's title and reflect changes for users who borrowed it
+            selectedBook.setTitle(newTitle);
+            updateBorrowedBookDetailsForUsers(oldTitle, selectedBook);
+
+            // Save updated data
+            saveUpdatedData();
+        });
+
+        // Editable author column
+        authorColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        authorColumn.setOnEditCommit(event -> {
+            Book selectedBook = event.getRowValue();
+            String oldAuthor = selectedBook.getAuthor();
+            String newAuthor = event.getNewValue();
+
+            // Update the book's author and reflect changes for users who borrowed it
+            selectedBook.setAuthor(newAuthor);
+            updateBorrowedBookDetailsForUsers(oldAuthor, selectedBook);
+
+            // Save updated data
+            saveUpdatedData();
+        });
+
+        // Editable ISBN column
+        isbnColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        isbnColumn.setOnEditCommit(event -> {
+            Book selectedBook = event.getRowValue();
+            String oldIsbn = selectedBook.getISBN();
+            String newIsbn = event.getNewValue();
+
+            // Update the book's ISBN and reflect changes for users who borrowed it
+            selectedBook.setISBN(newIsbn);
+            updateBorrowedBookDetailsForUsers(oldIsbn, selectedBook);
+
+            // Save updated data
+            saveUpdatedData();
+        });
+    }
+
+    // Method to update borrowed book details for users
+    private void updateBorrowedBookDetailsForUsers(String oldDetail, Book updatedBook) {
+        for (User user : users) {
+            if (user.getBorrowedBooks() != null && user.getBorrowedBooks().contains(updatedBook)) {
+                user.getBorrowedBooks().removeIf(book -> book.getTitle().equals(oldDetail) ||
+                        book.getAuthor().equals(oldDetail) ||
+                        book.getISBN().equals(oldDetail));
+                user.getBorrowedBooks().add(updatedBook);
+            }
+        }
+    }
+
+    // Method to save updated book and user data
+    private void saveUpdatedData() {
+        FileManager.saveBooks(library); // Save updated book list
+        FileManager.saveUsers(users);  // Save updated user list
+    }
+
+    // Method to setup editable columns in the user table
+    private void setupEditableUserColumns() {
+        // Editable name column
+        nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        nameColumn.setOnEditCommit(event -> {
+            User selectedUser = event.getRowValue();
+            String oldName = selectedUser.getName();
+            String newName = event.getNewValue();
+
+            // Update the user's name and reflect changes in borrowed book details
+            selectedUser.setName(newName);
+            updateBorrowedBookBorrowerNames(oldName, newName);
+
+            // Refresh the book table and save updated data
+            bookTable.refresh();
+            saveUpdatedData();
+        });
+
+        // Editable ID column
+        idColumn.setCellFactory(TextFieldTableCell.forTableColumn());
+        idColumn.setOnEditCommit(event -> {
+            User selectedUser = event.getRowValue();
+            selectedUser.setId(event.getNewValue());
+            FileManager.saveUsers(users); // Save updated user list
+        });
+    }
+
+    // Method to update borrower names in borrowed book details
+    private void updateBorrowedBookBorrowerNames(String oldName, String newName) {
+        for (Book book : library.getBooks()) {
+            if (book.getBorrower() != null && book.getBorrower().equals(oldName)) {
+                book.setBorrower(newName);
+            }
+        }
     }
 
     // Handle Back to Homepage button click
     @FXML
     private void handleBackButton() {
+        // Reset all buttons to default, keeping font size at 16px
+        backButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageUsersButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageLateReturnBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("homepage.fxml"));
             Scene homepageScene = new Scene(loader.load(), 1200, 800);
@@ -142,50 +324,102 @@ public class AdminController {
         }
     }
 
+    // Handle Manage Books button click
     @FXML
     private void handleManageBooks() {
+        // Update button styles and display the Book Management view
+        backButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageBooksButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageUsersButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageLateReturnBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+
         bookManagementView.setVisible(true);
         userManagementView.setVisible(false);
         lateReturnBooksView.setVisible(false);
-        System.out.println("Switched to Book Management View");
     }
 
+    // Handle Manage Users button click
     @FXML
     private void handleManageUsers() {
+        // Update button styles and display the User Management view
+        backButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageUsersButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageLateReturnBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+
         userManagementView.setVisible(true);
         bookManagementView.setVisible(false);
         lateReturnBooksView.setVisible(false);
-        System.out.println("Switched to User Management View");
     }
 
+    // Handle Add New Book button click
     @FXML
     private void handleAddBook() {
-        String title = titleInput.getText();
-        String author = authorInput.getText();
-        String isbn = isbnInput.getText();
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Add New Book");
+        dialog.setHeaderText("Enter the details of the new book:");
 
-        if (title.isEmpty() || author.isEmpty() || isbn.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Input Error", "All fields are required.");
-            return;
-        }
+        // Create dialog content
+        VBox dialogContent = new VBox(10);
+        TextField titleField = new TextField();
+        titleField.setPromptText("Book Title");
+        TextField authorField = new TextField();
+        authorField.setPromptText("Book Author");
+        TextField isbnField = new TextField();
+        isbnField.setPromptText("Book ISBN");
+        dialogContent.getChildren().addAll(new Label("Title:"), titleField, new Label("Author:"), authorField, new Label("ISBN:"), isbnField);
 
-        Book newBook = new Book(title, author, isbn, true, null,null,null);
-        library.addBook(newBook);
-        bookTable.getItems().add(newBook);
+        dialog.getDialogPane().setContent(dialogContent);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        titleInput.clear();
-        authorInput.clear();
-        isbnInput.clear();
-        FileManager.saveBooks(library);
+        // Show dialog and process result
+        dialog.showAndWait().ifPresent(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                String title = titleField.getText().trim();
+                String author = authorField.getText().trim();
+                String isbn = isbnField.getText().trim();
+
+                if (title.isEmpty() || author.isEmpty() || isbn.isEmpty()) {
+                    showAlert(Alert.AlertType.WARNING, "Input Error", "All fields are required.");
+                    return;
+                }
+
+                // Add new book to library and table
+                Book newBook = new Book(title, author, isbn, true, null, null, null);
+                library.addBook(newBook);
+                allBooks.add(newBook); // Update the ObservableList
+                FileManager.saveBooks(library);
+            }
+        });
     }
 
+    // Handle Delete Book button click
     @FXML
     private void handleDeleteBook() {
         Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
         if (selectedBook != null) {
-            library.getBooks().remove(selectedBook);
-            bookTable.getItems().remove(selectedBook);
-            FileManager.saveBooks(library);
+            if (!selectedBook.isAvailable()) {
+                showAlert(Alert.AlertType.WARNING, "Delete Error", "This book cannot be deleted as it is currently borrowed by a user.");
+                return;
+            }
+
+            Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmationAlert.setTitle("Delete Book");
+            confirmationAlert.setHeaderText("Are you sure you want to delete this book?");
+            confirmationAlert.setContentText("Title: " + selectedBook.getTitle() + "\nAuthor: " + selectedBook.getAuthor());
+
+            // Wait for confirmation
+            confirmationAlert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    // Remove the book from the library's list and ObservableList
+                    library.getBooks().remove(selectedBook); // Remove from the library data
+                    allBooks.remove(selectedBook); // Remove from the ObservableList
+                    FileManager.saveBooks(library); // Save the updated library to the file
+
+                    // Update the TableView
+                    bookTable.setItems(FXCollections.observableArrayList(library.getBooks()));
+                }
+            });
         } else {
             showAlert(Alert.AlertType.WARNING, "Selection Error", "Please select a book to delete.");
         }
@@ -193,30 +427,78 @@ public class AdminController {
 
     @FXML
     private void handleAddUser() {
-        String name = nameInput.getText();
-        String id = idInput.getText();
+        Dialog<ButtonType> dialog = new Dialog<>();
+        dialog.setTitle("Add New User");
+        dialog.setHeaderText("Enter the details of the new user:");
 
-        if (name.isEmpty() || id.isEmpty()) {
-            showAlert(Alert.AlertType.WARNING, "Input Error", "All fields are required.");
-            return;
-        }
+        // Create dialog content
+        VBox dialogContent = new VBox(10);
+        TextField nameField = new TextField();
+        nameField.setPromptText("User Name");
+        TextField idField = new TextField();
+        idField.setPromptText("User ID");
+        dialogContent.getChildren().addAll(new Label("Name:"), nameField, new Label("ID:"), idField);
 
-        User newUser = new User(name, id);
-        users.add(newUser);
-        userTable.getItems().add(newUser);
+        dialog.getDialogPane().setContent(dialogContent);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        nameInput.clear();
-        idInput.clear();
-        FileManager.saveUsers(users);
+        // Show dialog and process result
+        dialog.showAndWait().ifPresent(buttonType -> {
+            if (buttonType == ButtonType.OK) {
+                String name = nameField.getText().trim();
+                String id = idField.getText().trim();
+
+                // Validate input fields
+                if (name.isEmpty() || id.isEmpty()) {
+                    showAlert(Alert.AlertType.WARNING, "Input Error", "All fields are required.");
+                    return;
+                }
+
+                // Ensure user ID is unique
+                boolean isIdUnique = users.stream().noneMatch(user -> user.getId().equals(id));
+                if (!isIdUnique) {
+                    showAlert(Alert.AlertType.WARNING, "ID Error", "The user ID is already taken. Please enter a unique ID.");
+                    return;
+                }
+
+                // Add new user to the list and TableView
+                User newUser = new User(name, id);
+                users.add(newUser);
+                userTable.getItems().add(newUser); // Update the TableView
+                FileManager.saveUsers(users); // Save the updated list of users
+            }
+        });
     }
 
     @FXML
     private void handleDeleteUser() {
+        // Get the selected user from the TableView
         User selectedUser = userTable.getSelectionModel().getSelectedItem();
+
         if (selectedUser != null) {
-            users.remove(selectedUser);
-            userTable.getItems().remove(selectedUser);
-            FileManager.saveUsers(users);
+            // Check if the selected user has borrowed books
+            boolean hasBorrowedBooks = library.getBooks().stream()
+                    .anyMatch(book -> selectedUser.getName().equals(book.getBorrower()));
+
+            if (hasBorrowedBooks) {
+                showAlert(Alert.AlertType.WARNING, "Delete Error", "This user cannot be deleted as they have borrowed books.");
+                return;
+            }
+
+            // Confirm deletion
+            Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmationAlert.setTitle("Delete User");
+            confirmationAlert.setHeaderText("Are you sure you want to delete this user?");
+            confirmationAlert.setContentText("Name: " + selectedUser.getName() + "\nID: " + selectedUser.getId());
+
+            confirmationAlert.showAndWait().ifPresent(response -> {
+                if (response == ButtonType.OK) {
+                    // Remove user from list and TableView
+                    users.remove(selectedUser);
+                    userTable.getItems().remove(selectedUser);
+                    FileManager.saveUsers(users); // Save changes
+                }
+            });
         } else {
             showAlert(Alert.AlertType.WARNING, "Selection Error", "Please select a user to delete.");
         }
@@ -224,46 +506,60 @@ public class AdminController {
 
     @FXML
     private void handleSearchBooks() {
-        String searchQuery = searchBookInput.getText().toLowerCase();
-        ObservableList<Book> filteredBooks = FXCollections.observableArrayList(library.getBooks());
-        FilteredList<Book> filteredList = new FilteredList<>(filteredBooks, book ->
-                book.getTitle().toLowerCase().contains(searchQuery) ||
-                        book.getAuthor().toLowerCase().contains(searchQuery) ||
-                        book.getISBN().toLowerCase().contains(searchQuery) ||
-                        (book.getBorrower() != null && book.getBorrower().toLowerCase().contains(searchQuery))
-        );
-        bookTable.setItems(filteredList);
-        System.out.println("Books after search: " + filteredList.size());
+        // Add listener to filter book list based on search input
+        searchBookInput.textProperty().addListener((observable, oldValue, newValue) -> {
+            FilteredList<Book> filteredBooks = new FilteredList<>(allBooks, book ->
+                    book.getTitle().toLowerCase().contains(newValue.toLowerCase()) ||
+                            book.getAuthor().toLowerCase().contains(newValue.toLowerCase()) ||
+                            book.getISBN().toLowerCase().contains(newValue.toLowerCase())
+            );
+            bookTable.setItems(filteredBooks); // Update TableView with filtered list
+        });
     }
 
     @FXML
     private void handleSearchUsers() {
-        String searchQuery = searchUserInput.getText().toLowerCase();
-        ObservableList<User> filteredUsers = FXCollections.observableArrayList(users);
-        FilteredList<User> filteredList = new FilteredList<>(filteredUsers, user ->
-                user.getName().toLowerCase().contains(searchQuery) ||
-                        user.getId().toLowerCase().contains(searchQuery)
-        );
-        userTable.setItems(filteredList);
-        System.out.println("Users after search: " + filteredList.size());
+        // Add listener to filter user list based on search input
+        searchUserInput.textProperty().addListener((observable, oldValue, newValue) -> {
+            FilteredList<User> filteredUsers = new FilteredList<>(FXCollections.observableArrayList(users), user ->
+                    user.getName().toLowerCase().contains(newValue.toLowerCase()) ||
+                            user.getId().toLowerCase().contains(newValue.toLowerCase())
+            );
+            userTable.setItems(filteredUsers); // Update TableView with filtered list
+        });
+    }
+
+    @FXML
+    private void initializeBorrowedBooks() {
+        // Initialize borrowed books TableView columns
+        bookTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
+        bookAuthorColumn.setCellValueFactory(new PropertyValueFactory<>("author"));
+        bookIsbnColumn.setCellValueFactory(new PropertyValueFactory<>("ISBN"));
+        bookBorrowDateColumn.setCellValueFactory(new PropertyValueFactory<>("borrowDate"));
+        bookReturnDateColumn.setCellValueFactory(new PropertyValueFactory<>("returnDate"));
     }
 
     @FXML
     private void displayBorrowedBooks(User user) {
-        borrowedBooksListView.getItems().clear();
+        // Clear existing items in the borrowed books TableView
+        borrowedBooksTableView.getItems().clear();
+
+        // Filter books borrowed by the selected user
         List<Book> borrowedBooks = library.getBooks().stream()
                 .filter(book -> book.getBorrower() != null && book.getBorrower().equals(user.getName()))
                 .collect(Collectors.toList());
+
         if (borrowedBooks.isEmpty()) {
-            borrowedBooksListView.getItems().add("No books borrowed");
+            // Display placeholder if no books are borrowed
+            borrowedBooksTableView.setPlaceholder(new Label("No books borrowed"));
         } else {
-            for (Book book : borrowedBooks) {
-                String bookDetails = String.format("Title: %s, Author: %s, ISBN: %s, Returned Date: %s", book.getTitle(), book.getAuthor(), book.getISBN(),book.getReturnDate());
-                borrowedBooksListView.getItems().add(bookDetails);
-            }
+            // Update TableView with borrowed books
+            borrowedBooksTableView.setItems(FXCollections.observableArrayList(borrowedBooks));
         }
     }
 
+
+    // Method to setup the late return books table
     private void setupLateReturnBooksTable() {
         borrowedTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         borrowerNameColumn.setCellValueFactory(data ->
@@ -278,14 +574,14 @@ public class AdminController {
             LocalDate returnDate = data.getValue().getReturnDate();
             if (returnDate != null && LocalDate.now().isAfter(returnDate)) {
                 long daysOverdue = ChronoUnit.DAYS.between(returnDate, LocalDate.now());
-                double fine = daysOverdue * 1.0;
+                double fine = daysOverdue * 1.0; // Calculate fine at $1 per overdue day
                 return new ReadOnlyStringWrapper("$" + fine);
             }
             return new ReadOnlyStringWrapper("$0");
         });
     }
 
-
+    // Method to initialize the borrowed books table for overdue books
     private void initializeBorrowedBooksTable() {
         ObservableList<Book> overdueBooks = FXCollections.observableArrayList(
                 library.getBooks().stream()
@@ -295,21 +591,31 @@ public class AdminController {
         borrowedBooksTable.setItems(overdueBooks);
     }
 
+    // Method to handle switching to the Late Return Books management view
     @FXML
     private void handleManageLateReturnBooks() {
+        // Update button styles and font size
+        backButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageUsersButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        manageLateReturnBooksButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px;");
+
+        // Update visible views
         bookManagementView.setVisible(false);
         userManagementView.setVisible(false);
         lateReturnBooksView.setVisible(true);
-        initializeBorrowedBooksTable(); // Ensure the table is up-to-date
-        System.out.println("Switched to Late Return Books View");
+
+        // Ensure the table is up-to-date
+        initializeBorrowedBooksTable();
     }
 
+    // Method to handle renewing a book's return date
     @FXML
     private void handleRenewBook() {
         Book selectedBook = borrowedBooksTable.getSelectionModel().getSelectedItem();
         if (selectedBook != null) {
             LocalDate now = LocalDate.now();
-            selectedBook.setReturnDate(now.plusDays(7)); // Update return date
+            selectedBook.setReturnDate(now.plusDays(7)); // Extend return date by 7 days
             FileManager.saveBooks(library); // Save updates to the CSV
             initializeBorrowedBooksTable(); // Refresh table
             showAlert(Alert.AlertType.INFORMATION, "Book Renewed",
@@ -319,6 +625,7 @@ public class AdminController {
         }
     }
 
+    // Method to handle returning a book
     @FXML
     private void handleReturnBook() {
         Book selectedBook = borrowedBooksTable.getSelectionModel().getSelectedItem();
@@ -336,7 +643,7 @@ public class AdminController {
         }
     }
 
-
+    // Utility method to show alerts
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);
         alert.setTitle(title);

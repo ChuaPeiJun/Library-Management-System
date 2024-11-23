@@ -10,46 +10,91 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Text?>
 
-<?import javafx.scene.control.cell.PropertyValueFactory?>
-<AnchorPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: linear-gradient(to bottom, #d7e8f7, #b0d3f0);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.AdminController">
-    <Text layoutX="20" layoutY="30" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Admin Management Page" />
+<AnchorPane prefHeight="800.0" prefWidth="1200.0"
+            style="-fx-background-color: linear-gradient(to bottom, #d7e8f7, #b0d3f0);"
+            xmlns="http://javafx.com/javafx/23.0.1"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.demo.AdminController">
 
+    <!-- Header -->
+    <Text layoutX="20" layoutY="40"
+          style="-fx-font-size: 24px; -fx-font-weight: bold;"
+          text="Admin Management Page" />
+
+    <!-- Sidebar Navigation -->
     <VBox layoutX="20" layoutY="70" spacing="15">
-        <Button fx:id="backButton" onAction="#handleBackButton" style="-fx-font-size: 16px; -fx-background-color: #3b5998; -fx-text-fill: white;" text="Back to Homepage" />
-        <Button fx:id="manageBooksButton" onAction="#handleManageBooks" prefHeight="100.0" prefWidth="155.5" style="-fx-font-size: 16px; -fx-background-color: #8b9dc3; -fx-text-fill: white;" text="Manage Books" />
-        <Button fx:id="manageUsersButton" onAction="#handleManageUsers" prefHeight="100.0" prefWidth="155.5" style="-fx-font-size: 16px; -fx-background-color: #8b9dc3; -fx-text-fill: white;" text="Manage Users" />
-        <Button fx:id="manageLateReturnBooksButton" onAction="#handleManageLateReturnBooks" prefHeight="100.0" prefWidth="155.5" style="-fx-font-size: 16px; -fx-background-color: #8b9dc3; -fx-text-fill: white;" text="Manage Late Returns" />
+        <Button fx:id="backButton" onAction="#handleBackButton" prefWidth="180" text="Back to Homepage" />
+        <Button fx:id="manageBooksButton" onAction="#handleManageBooks" prefHeight="100.0" prefWidth="180" text="Manage Books" />
+        <Button fx:id="manageUsersButton" onAction="#handleManageUsers" prefHeight="100.0" prefWidth="180" text="Manage Users" />
+        <Button fx:id="manageLateReturnBooksButton" onAction="#handleManageLateReturnBooks" prefHeight="100.0" prefWidth="180" text="Manage Late Returns" />
     </VBox>
 
     <!-- Book Management View -->
-    <VBox fx:id="bookManagementView" layoutX="200" layoutY="70" spacing="10" visible="false">
-        <HBox spacing="10">
-            <TextField fx:id="searchBookInput" promptText="Search Books" style="-fx-font-size: 16px; -fx-background-color: white; -fx-padding: 10px;" />
-            <Button onAction="#handleSearchBooks" style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;" text="Search" />
-        </HBox>
+    <VBox fx:id="bookManagementView" layoutX="230" layoutY="70" spacing="10" visible="false">
+        <TextField fx:id="searchBookInput"
+                   promptText="Search books by title, author, or ISBN"
+                   style="-fx-font-size: 16px; -fx-background-color: white; -fx-padding: 5px;" />
         <TableView fx:id="bookTable" prefHeight="400.0" prefWidth="900.0" style="-fx-background-color: #f3f3f3;">
             <columns>
-                <TableColumn fx:id="titleColumn" prefWidth="180.0" text="Title" />
-                <TableColumn fx:id="authorColumn" prefWidth="180.0" text="Author" />
-                <TableColumn fx:id="isbnColumn" prefWidth="180.0" text="ISBN" />
-                <TableColumn fx:id="availabilityColumn" prefWidth="180.0" text="Available" />
-                <TableColumn fx:id="borrowerColumn" prefWidth="180.0" text="Borrower" />
+                <TableColumn fx:id="titleColumn" prefWidth="150.0" text="Title" />
+                <TableColumn fx:id="authorColumn" prefWidth="150.0" text="Author" />
+                <TableColumn fx:id="isbnColumn" prefWidth="150.0" text="ISBN" />
+                <TableColumn fx:id="availabilityColumn" prefWidth="100.0" text="Available" />
+                <TableColumn fx:id="borrowerColumn" prefWidth="150.0" text="Borrower" />
+                <TableColumn fx:id="borrowDateColumn1" prefWidth="100.0" text="Borrow Date" />
+                <TableColumn fx:id="returnDateColumn1" prefWidth="100.0" text="Return Date" />
             </columns>
         </TableView>
-
         <HBox spacing="10">
-            <TextField fx:id="titleInput" promptText="Book Title" style="-fx-background-color: white; -fx-padding: 10px;" />
-            <TextField fx:id="authorInput" promptText="Book Author" style="-fx-background-color: white; -fx-padding: 10px;" />
-            <TextField fx:id="isbnInput" promptText="Book ISBN" style="-fx-background-color: white; -fx-padding: 10px;" />
+            <Button onAction="#handleAddBook"
+                    style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;"
+                    text="Add Book" />
+            <Button onAction="#handleDeleteBook"
+                    style="-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;"
+                    text="Delete Book" />
+        </HBox>
+    </VBox>
+
+    <!-- User Management View -->
+    <VBox fx:id="userManagementView" layoutX="230" layoutY="70" spacing="10" visible="false">
+        <HBox spacing="10">
+            <TextField fx:id="searchUserInput"
+                       promptText="Search users by name or ID"
+                       prefWidth="280.0"
+                       style="-fx-font-size: 16px; -fx-background-color: white; -fx-padding: 5px;" />
+        </HBox>
+        <HBox spacing="20">
+            <TableView fx:id="userTable" prefHeight="400.0" prefWidth="280.0" style="-fx-background-color: #f3f3f3;">
+                <columns>
+                    <TableColumn fx:id="nameColumn" prefWidth="180.0" text="Name" />
+                    <TableColumn fx:id="idColumn" prefWidth="100.0" text="ID" />
+                </columns>
+            </TableView>
+            <VBox spacing="15">
+                <Text style="-fx-font-size: 20px;" text="Borrowed Books: " />
+                <TableView fx:id="borrowedBooksTableView" prefHeight="380.0" prefWidth="630.0" style="-fx-background-color: #f3f3f3;">
+                    <columns>
+                        <TableColumn fx:id="bookTitleColumn" text="Title" prefWidth="150" />
+                        <TableColumn fx:id="bookAuthorColumn" text="Author" prefWidth="120" />
+                        <TableColumn fx:id="bookIsbnColumn" text="ISBN" prefWidth="120" />
+                        <TableColumn fx:id="bookBorrowDateColumn" text="Borrow Date" prefWidth="120" />
+                        <TableColumn fx:id="bookReturnDateColumn" text="Return Date" prefWidth="120" />
+                    </columns>
+                </TableView>
+            </VBox>
         </HBox>
         <HBox spacing="10">
-            <Button onAction="#handleAddBook" style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;" text="Add Book" />
-            <Button onAction="#handleDeleteBook" style="-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;" text="Delete Book" />
+            <Button onAction="#handleAddUser"
+                    style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;"
+                    text="Add User" />
+            <Button onAction="#handleDeleteUser"
+                    style="-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;"
+                    text="Delete User" />
         </HBox>
     </VBox>
 
     <!-- Late Return Books Management -->
-    <VBox fx:id="lateReturnBooksView" layoutX="200" layoutY="70" spacing="10" visible="false">
+    <VBox fx:id="lateReturnBooksView" layoutX="230" layoutY="70" spacing="10" visible="false">
         <TableView fx:id="borrowedBooksTable" prefHeight="400.0" prefWidth="900.0" style="-fx-background-color: #f3f3f3;">
             <columns>
                 <TableColumn fx:id="borrowedTitleColumn" prefWidth="180.0" text="Title" />
@@ -59,39 +104,15 @@
                 <TableColumn fx:id="fineColumn" prefWidth="180.0" text="Fine" />
             </columns>
         </TableView>
-
         <HBox spacing="10">
-            <Button fx:id="renewBookButton" onAction="#handleRenewBook" style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;" text="Renew Book" />
-            <Button fx:id="returnBookButton" onAction="#handleReturnBook" style="-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;" text="Return Book" />
+            <Button fx:id="renewBookButton"
+                    onAction="#handleRenewBook"
+                    style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;"
+                    text="Renew Book" />
+            <Button fx:id="returnBookButton"
+                    onAction="#handleReturnBook"
+                    style="-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;"
+                    text="Return Book" />
         </HBox>
     </VBox>
-
-    <!-- User Management View -->
-    <VBox fx:id="userManagementView" layoutX="200" layoutY="70" spacing="10" visible="false">
-        <HBox spacing="10">
-            <TextField fx:id="searchUserInput" promptText="Search Users" style="-fx-font-size: 16px; -fx-background-color: white; -fx-padding: 10px;" />
-            <Button onAction="#handleSearchUsers" style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;" text="Search" />
-        </HBox>
-        <HBox spacing="20">
-            <TableView fx:id="userTable" prefHeight="400.0" prefWidth="450.0" style="-fx-background-color: #f3f3f3;">
-                <columns>
-                    <TableColumn fx:id="nameColumn" prefWidth="225.0" text="Name" />
-                    <TableColumn fx:id="idColumn" prefWidth="225.0" text="ID" />
-                </columns>
-            </TableView>
-            <VBox>
-                <Text style="-fx-font-size: 16px; " text="Borrowed Books: " />
-                <ListView fx:id="borrowedBooksListView" prefHeight="380.0" prefWidth="450.0" style="-fx-background-color: #f3f3f3;" />
-            </VBox>
-        </HBox>
-        <HBox spacing="10">
-            <TextField fx:id="nameInput" promptText="User Name" style="-fx-background-color: white; -fx-padding: 10px;" />
-            <TextField fx:id="idInput" promptText="User ID" style="-fx-background-color: white; -fx-padding: 10px;" />
-        </HBox>
-        <HBox spacing="10">
-            <Button onAction="#handleAddUser" style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;" text="Add User" />
-            <Button onAction="#handleDeleteUser" style="-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;" text="Delete User" />
-        </HBox>
-    </VBox>
-
 </AnchorPane>
