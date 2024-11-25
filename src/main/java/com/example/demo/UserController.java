@@ -74,6 +74,7 @@ public class UserController {
     private User currentUser;
     private ObservableList<Book> allBooks;
     private ObservableList<Book> borrowedBooks;
+    private int renewalCount = 0;
 
     @FXML
     public void initialize() {
@@ -96,6 +97,10 @@ public class UserController {
 
     @FXML
     private void showBorrowBookView() {
+        backToHomepageButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+        viewBorrowedBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+        borrowBookButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+
         borrowBookView.setVisible(true);
         borrowBookView.setManaged(true);
         borrowedBooksView.setVisible(false);
@@ -104,6 +109,10 @@ public class UserController {
 
     @FXML
     private void showBorrowedBooksView() {
+        backToHomepageButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+        borrowBookButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+        viewBorrowedBooksButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
+
         borrowBookView.setVisible(false);
         borrowBookView.setManaged(false);
         borrowedBooksView.setVisible(true);
@@ -113,6 +122,7 @@ public class UserController {
     @FXML
     private void handleBackToHomepage() {
         try {
+            renewalCount = 0;
             FXMLLoader loader = new FXMLLoader(getClass().getResource("homepage.fxml"));
             Scene homepageScene = new Scene(loader.load(), 1200, 800);
             Stage stage = (Stage) backToHomepageButton.getScene().getWindow();
@@ -261,14 +271,20 @@ public class UserController {
                                 " with the library before renewing.");
                 return; // Prevent renewing the book
             }
-
+            if (renewalCount >= 1) { // Limit to one renewal
+                showAlert(Alert.AlertType.WARNING, "Renewal Denied",
+                        "You have already renewed a book once. You cannot renew again in this session.");
+                return;
+            }
             // Extend return date by 7 days
             selectedBook.setReturnDate(returnDate.plusDays(7));
             FileManager.saveBooks(library); // Save changes to the CSV
             initializeBookTables();
+            borrowedBooksTable.refresh();
 
             showAlert(Alert.AlertType.INFORMATION, "Book Renewed",
                     "The return date for '" + selectedBook.getTitle() + "' has been extended to: " + selectedBook.getReturnDate());
+            renewalCount+=1;
         } else {
             showAlert(Alert.AlertType.WARNING, "Renew Book",
                     "Please select a borrowed book to renew.");
@@ -283,5 +299,6 @@ public class UserController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+        alert.setHeight(400);
     }
 }

@@ -9,47 +9,58 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.StackPane?>
 
-<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.demo.UserController" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: linear-gradient(to bottom, #d7e8f7, #b0d3f0);">
+<?import javafx.scene.layout.HBox?>
+<?import javafx.geometry.Insets?>
+<BorderPane xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.demo.UserController" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: linear-gradient(to bottom, #ffffff, #add8e6);">
     <!-- Left Sidebar -->
     <left>
-        <VBox spacing="15" alignment="TOP_CENTER" layoutX="20" layoutY="70" prefWidth="200" style="-fx-background-color: #f4f4f4; -fx-padding: 10;">
-            <Label fx:id="usernameLabel" text="Username" style="-fx-font-size: 14px; -fx-font-weight: bold;" />
-            <Button fx:id="backToHomepageButton" text="Back to Homepage" maxWidth="180" onAction="#handleBackToHomepage" prefWidth="155.5" style="-fx-font-size: 16px; -fx-background-color: #3b5998; -fx-text-fill: white;" />
-            <Button fx:id="borrowBookButton" text="Borrow Book" onAction="#showBorrowBookView" prefHeight="100.0" prefWidth="155.5" style="-fx-font-size: 16px; -fx-background-color: #8b9dc3; -fx-text-fill: white;"/>
-            <Button fx:id="viewBorrowedBooksButton" text="View Borrowed Books" onAction="#showBorrowedBooksView" prefHeight="100.0" prefWidth="155.5" style="-fx-font-size: 16px; -fx-background-color: #8b9dc3; -fx-text-fill: white;"/>
+        <VBox spacing="15" alignment="TOP_CENTER" layoutX="20" layoutY="70" prefWidth="250" style="-fx-padding: 20;">
+            <Label fx:id="usernameLabel" text="Username" wrapText="true" textAlignment="CENTER" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+            <Button fx:id="borrowBookButton" text="Borrow Book" onAction="#showBorrowBookView" prefHeight="100.0" prefWidth="200"
+                    style="-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10px;"/>
+            <Button fx:id="viewBorrowedBooksButton" text="View Borrowed Books" onAction="#showBorrowedBooksView" prefHeight="100.0" prefWidth="200"
+                    style="-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10px;"/>
+            <Button fx:id="backToHomepageButton" text="Back to Homepage" onAction="#handleBackToHomepage" prefWidth="200"
+                    style="-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10px; "  />
         </VBox>
     </left>
 
     <!-- Center Content -->
     <center>
-        <StackPane fx:id="mainContent">
+        <StackPane fx:id="mainContent" >
             <!-- Borrow Book Table -->
-            <VBox fx:id="borrowBookView" spacing="10" layoutX="200" layoutY="70" alignment="TOP_CENTER" >
-                <TextField fx:id="searchBookInput" promptText="Search books by title, author, or ISBN" />
-                <TableView fx:id="bookTable" prefHeight="400">
+            <VBox fx:id="borrowBookView" spacing="20" layoutX="200" layoutY="70" style="-fx-padding: 20px;">
+                <TextField fx:id="searchBookInput" promptText="Search books by title, author, or ISBN" maxWidth="750"
+                           style="-fx-font-size: 16px; -fx-background-color: #ffffff; -fx-padding: 8px; -fx-border-radius: 5px; -fx-border-color: #cccccc;" />
+                <TableView fx:id="bookTable" prefHeight="450" maxWidth="750">
                     <columns>
-                        <TableColumn fx:id="titleColumn" text="Title" prefWidth="150" />
-                        <TableColumn fx:id="authorColumn" text="Author"  />
-                        <TableColumn fx:id="isbnColumn" text="ISBN" prefWidth="100" />
-                        <TableColumn fx:id="availabilityColumn" text="Available" />
+                        <TableColumn fx:id="titleColumn" text="Title" prefWidth="250" />
+                        <TableColumn fx:id="authorColumn" text="Author" prefWidth="200" />
+                        <TableColumn fx:id="isbnColumn" text="ISBN" prefWidth="200" />
+                        <TableColumn fx:id="availabilityColumn" text="Available" prefWidth="100"/>
                     </columns>
                 </TableView>
-                <Button fx:id="borrowSelectedBookButton" text="Borrow Selected Book" onAction="#handleBorrowBook" style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;"/>
+                <Button fx:id="borrowSelectedBookButton" text="Borrow Selected Book" onAction="#handleBorrowBook" style="-fx-font-size: 16px; -fx-background-color: #4caf50;-fx-font-weight: bold; -fx-text-fill: white;"/>
             </VBox>
 
             <!-- Borrowed Books Table -->
-            <VBox fx:id="borrowedBooksView" spacing="10" alignment="TOP_CENTER" visible="false" managed="false">
-                <TableView fx:id="borrowedBooksTable" prefHeight="400">
+            <VBox fx:id="borrowedBooksView" spacing="20" visible="false" style="-fx-padding: 20px;">
+                <StackPane.margin>
+                    <Insets top="20" />
+                </StackPane.margin>
+                <TableView fx:id="borrowedBooksTable" prefHeight="450.0" maxWidth="750.0" >
                     <columns>
-                        <TableColumn fx:id="borrowedTitleColumn" text="Title" prefWidth="150" />
-                        <TableColumn fx:id="borrowedISBNColumn" text="ISBN" prefWidth="100" />
-                        <TableColumn fx:id="borrowedStatusColumn" text="Status" prefWidth="100" />
-                        <TableColumn fx:id="borrowDateColumn" text="Borrow Date" />
-                        <TableColumn fx:id="returnDateColumn" text="Return Date" />
+                        <TableColumn fx:id="borrowedTitleColumn" text="Title" prefWidth="250.0" />
+                        <TableColumn fx:id="borrowedISBNColumn" text="ISBN" prefWidth="200.0" />
+                        <TableColumn fx:id="borrowedStatusColumn" text="Status" prefWidth="100.0" />
+                        <TableColumn fx:id="borrowDateColumn" text="Borrow Date" prefWidth="100.0"/>
+                        <TableColumn fx:id="returnDateColumn" text="Return Date" prefWidth="100.0"/>
                     </columns>
                 </TableView>
-                <Button fx:id="returnSelectedBookButton" text="Return Selected Book" onAction="#handleReturnBook" style="-fx-font-size: 16px; -fx-background-color: #4caf50; -fx-text-fill: white;"/>
-                <Button fx:id="renewSelectedBookButton" text="Renew Selected Book" onAction="#handleRenewBook" style="-fx-font-size: 16px; -fx-background-color: #f44336; -fx-text-fill: white;"/>
+                <HBox spacing="20">
+                    <Button fx:id="returnSelectedBookButton" text="Return Selected Book" onAction="#handleReturnBook" style="-fx-font-size: 16px;-fx-font-weight: bold;  -fx-background-color: #4caf50; -fx-text-fill: white;"/>
+                    <Button fx:id="renewSelectedBookButton" text="Renew Selected Book" onAction="#handleRenewBook" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-background-color: #f44336; -fx-text-fill: white;"/>
+                </HBox>
             </VBox>
         </StackPane>
     </center>
