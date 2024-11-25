@@ -574,10 +574,12 @@ public class AdminController {
             LocalDate returnDate = data.getValue().getReturnDate();
             if (returnDate != null && LocalDate.now().isAfter(returnDate)) {
                 long daysOverdue = ChronoUnit.DAYS.between(returnDate, LocalDate.now());
-                double fine = daysOverdue * 1.0; // Calculate fine at $1 per overdue day
-                return new ReadOnlyStringWrapper("$" + fine);
+                double fine = daysOverdue * 1.0; // Calculate fine at RM1 per overdue day
+                // Format the fine to 2 decimal places
+                String fineFormatted = String.format("%.2f", fine);
+                return new ReadOnlyStringWrapper("RM" + fineFormatted);
             }
-            return new ReadOnlyStringWrapper("$0");
+            return new ReadOnlyStringWrapper("RM0");
         });
     }
 
