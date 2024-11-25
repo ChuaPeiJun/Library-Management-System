@@ -18,7 +18,7 @@
             <Label fx:id="usernameLabel" text="Username" wrapText="true" textAlignment="CENTER" style="-fx-font-size: 20px; -fx-font-weight: bold;" />
             <Button fx:id="borrowBookButton" text="Borrow Book" onAction="#showBorrowBookView" prefHeight="100.0" prefWidth="200"
                     style="-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10px;"/>
-            <Button fx:id="viewBorrowedBooksButton" text="View Borrowed Books" onAction="#showBorrowedBooksView" prefHeight="100.0" prefWidth="200"
+            <Button fx:id="viewBorrowedBooksButton" text="Return/Renew Book" onAction="#showBorrowedBooksView" prefHeight="100.0" prefWidth="200"
                     style="-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10px;"/>
             <Button fx:id="backToHomepageButton" text="Back to Homepage" onAction="#handleBackToHomepage" prefWidth="200"
                     style="-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10px; "  />

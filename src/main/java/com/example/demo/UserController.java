@@ -228,10 +228,12 @@ public class UserController {
 
             if (now.isAfter(returnDate)) { // Check for overdue
                 long daysOverdue = ChronoUnit.DAYS.between(returnDate, now);
-                double fine = daysOverdue * 1.0; // $1 per day overdue
+                double fine = daysOverdue * 1.00; // RM1 per day overdue
+                // Format the fine to 2 decimal places
+                String fineFormatted = String.format("%.2f", fine);
 
                 showAlert(Alert.AlertType.WARNING, "Late Return",
-                        "The book is overdue by " + daysOverdue + " days. Please settle a fine of $" + fine +
+                        "The book is overdue by " + daysOverdue + " days. Please settle a fine of RM" + fineFormatted +
                                 " with the library before returning.");
                 return; // Prevent returning the book
             }
@@ -264,10 +266,12 @@ public class UserController {
 
             if (now.isAfter(returnDate)) { // Check for overdue
                 long daysOverdue = ChronoUnit.DAYS.between(returnDate, now);
-                double fine = daysOverdue * 1.0; // $1 per day overdue
+                double fine = daysOverdue * 1.00; // RM1 per day overdue
+                // Format the fine to 2 decimal places
+                String fineFormatted = String.format("%.2f", fine);
 
                 showAlert(Alert.AlertType.WARNING, "Renewal Denied",
-                        "The book is overdue by " + daysOverdue + " days. Please settle a fine of $" + fine +
+                        "The book is overdue by " + daysOverdue + " days. Please settle a fine of RM" + fineFormatted +
                                 " with the library before renewing.");
                 return; // Prevent renewing the book
             }
