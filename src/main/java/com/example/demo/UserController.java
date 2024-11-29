@@ -74,8 +74,6 @@ public class UserController {
     private User currentUser;
     private ObservableList<Book> allBooks;
     private ObservableList<Book> borrowedBooks;
-    private int renewalCount = 0;
-
     @FXML
     public void initialize() {
         // Load data
@@ -122,7 +120,6 @@ public class UserController {
     @FXML
     private void handleBackToHomepage() {
         try {
-            renewalCount = 0;
             FXMLLoader loader = new FXMLLoader(getClass().getResource("homepage.fxml"));
             Scene homepageScene = new Scene(loader.load(), 1200, 800);
             Stage stage = (Stage) backToHomepageButton.getScene().getWindow();
@@ -275,10 +272,10 @@ public class UserController {
                                 " with the library before renewing.");
                 return; // Prevent renewing the book
             }
-            if (renewalCount >= 1) { // Limit to one renewal
+            if (ChronoUnit.DAYS.between(now, returnDate) >= 7) { // Check if renewal is too early
                 showAlert(Alert.AlertType.WARNING, "Renewal Denied",
-                        "You have already renewed a book once. You cannot renew again in this session.");
-                return;
+                        "You have already renewed a book once. You cannot renew again.");
+                return; // Prevent renewing the book
             }
             // Extend return date by 7 days
             selectedBook.setReturnDate(returnDate.plusDays(7));
@@ -288,7 +285,6 @@ public class UserController {
 
             showAlert(Alert.AlertType.INFORMATION, "Book Renewed",
                     "The return date for '" + selectedBook.getTitle() + "' has been extended to: " + selectedBook.getReturnDate());
-            renewalCount+=1;
         } else {
             showAlert(Alert.AlertType.WARNING, "Renew Book",
                     "Please select a borrowed book to renew.");

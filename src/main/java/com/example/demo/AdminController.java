@@ -283,6 +283,7 @@ public class AdminController {
 
             // Refresh the book table and save updated data
             bookTable.refresh();
+            borrowedBooksTable.refresh();
             saveUpdatedData();
         });
 
@@ -622,6 +623,7 @@ public class AdminController {
             initializeBorrowedBooksTable(); // Refresh table
             showAlert(Alert.AlertType.INFORMATION, "Book Renewed",
                     "The book '" + selectedBook.getTitle() + "' has been renewed for 7 days starting today.");
+            bookTable.refresh();
         } else {
             showAlert(Alert.AlertType.WARNING, "Renew Book", "Please select a book to renew.");
         }
@@ -640,6 +642,7 @@ public class AdminController {
             initializeBorrowedBooksTable(); // Refresh table
             showAlert(Alert.AlertType.INFORMATION, "Book Returned",
                     "The book '" + selectedBook.getTitle() + "' has been returned.");
+            bookTable.refresh();
         } else {
             showAlert(Alert.AlertType.WARNING, "Return Book", "Please select a book to return.");
         }
