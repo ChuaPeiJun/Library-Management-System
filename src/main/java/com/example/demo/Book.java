@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 // Class representing a Book
 public class Book {
@@ -95,15 +96,64 @@ public class Book {
         return daysOverdue * 1.0; // $1.00 fine per day
     }
 
-    // Method to renew the book (extends return date by 7 days if not overdue)
-    public boolean renew() {
-        if (isOverdue()) {
-            return false; // Cannot renew overdue books
-        }
-        if (returnDate != null) {
-            returnDate = returnDate.plusDays(7);
+    // Method to borrow a book
+    public boolean borrow(String borrowerName) {
+        if (this.isAvailable()) {
+            LocalDate now = LocalDate.now();
+            this.available = false;
+            this.borrower = borrowerName;
+            this.borrowDate = now;
+            this.returnDate = now.plusDays(7); // 7-day borrowing period
             return true;
         }
-        return false;
+        return false; // Book is not available
     }
+
+    // Method to return a book
+    public String returnBook(String returningUser) {
+        if (this.borrower == null || !this.borrower.equals(returningUser)) {
+            return "You are not the borrower of this book.";
+        }
+
+        LocalDate now = LocalDate.now();
+        if (this.returnDate != null && now.isAfter(this.returnDate)) {
+            long daysOverdue = ChronoUnit.DAYS.between(this.returnDate, now);
+            double fine = daysOverdue * 1.00; // RM1 per day overdue
+            String fineFormatted = String.format("%.2f", fine);
+            return "The book is overdue by " + daysOverdue + " days. Please settle a fine of RM" + fineFormatted +
+                    " with the library before returning.";
+        }
+
+        // Reset book details to mark it as available
+        this.available = true;
+        this.borrower = null;
+        this.borrowDate = null;
+        this.returnDate = null;
+
+        return "success"; // Indicates a successful return
+    }
+
+    // Method to renew a book
+    public String renewBook(String borrowerName) {
+        if (this.borrower == null || !this.borrower.equals(borrowerName)) {
+            return "You are not the borrower of this book.";
+        }
+
+        LocalDate now = LocalDate.now();
+        if (this.returnDate != null && now.isAfter(this.returnDate)) {
+            long daysOverdue = ChronoUnit.DAYS.between(this.returnDate, now);
+            double fine = daysOverdue * 1.00; // RM1 per day overdue
+            String fineFormatted = String.format("%.2f", fine);
+            return "The book is overdue by " + daysOverdue + " days. Please settle a fine of RM" + fineFormatted +
+                    " with the library before renewing.";
+        }
+
+        if (ChronoUnit.DAYS.between(now, this.returnDate) >= 7) {
+            return "You have already renewed this book. You cannot renew it again.";
+        }
+
+        this.returnDate = this.returnDate.plusDays(7); // Extend return date by 7 days
+        return "success"; // Indicates a successful renewal
+    }
+
 }

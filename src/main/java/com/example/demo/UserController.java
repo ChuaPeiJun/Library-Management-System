@@ -195,14 +195,8 @@ public class UserController {
     @FXML
     private void handleBorrowBook() {
         Book selectedBook = bookTable.getSelectionModel().getSelectedItem();
-        if (selectedBook != null && selectedBook.isAvailable()) {
-            LocalDate now = LocalDate.now();
-            selectedBook.setAvailable(false);
-            selectedBook.setBorrower(currentUser.getName());
-            selectedBook.setBorrowDate(now);
-            selectedBook.setReturnDate(now.plusDays(7)); // 7-day borrowing period
-            bookTable.refresh();//update the UI with the latest changes
-
+        if (selectedBook != null && selectedBook.borrow(currentUser.getName())) {
+            bookTable.refresh(); // Update the UI with the latest changes
             FileManager.saveBooks(library);
             initializeBookTables();
 
@@ -215,81 +209,52 @@ public class UserController {
         }
     }
 
+
     @FXML
     private void handleReturnBook() {
         Book selectedBook = borrowedBooksTable.getSelectionModel().getSelectedItem();
-        if (selectedBook != null && selectedBook.getBorrower() != null &&
-                selectedBook.getBorrower().equals(currentUser.getName())) { // Match name
-            LocalDate now = LocalDate.now();
-            LocalDate returnDate = selectedBook.getReturnDate();
+        if (selectedBook != null) {
+            String result = selectedBook.returnBook(currentUser.getName());
 
-            if (now.isAfter(returnDate)) { // Check for overdue
-                long daysOverdue = ChronoUnit.DAYS.between(returnDate, now);
-                double fine = daysOverdue * 1.00; // RM1 per day overdue
-                // Format the fine to 2 decimal places
-                String fineFormatted = String.format("%.2f", fine);
+            if (result.equals("success")) {
 
-                showAlert(Alert.AlertType.WARNING, "Late Return",
-                        "The book is overdue by " + daysOverdue + " days. Please settle a fine of RM" + fineFormatted +
-                                " with the library before returning.");
-                return; // Prevent returning the book
+                borrowedBooksTable.refresh(); // Update the UI
+                bookTable.refresh();
+                FileManager.saveBooks(library);
+                initializeBookTables();
+
+                showAlert(Alert.AlertType.INFORMATION, "Book Returned",
+                        "You have successfully returned the book: " + selectedBook.getTitle());
+            } else {
+                showAlert(Alert.AlertType.WARNING, "Return Book", result);
             }
-
-            // Update book details to mark as returned
-            selectedBook.setAvailable(true);
-            selectedBook.setBorrower(null);
-            selectedBook.setBorrowDate(null);
-            selectedBook.setReturnDate(null);
-
-            FileManager.saveBooks(library); // Save changes to the CSV
-            initializeBookTables();
-            bookTable.refresh();
-
-            showAlert(Alert.AlertType.INFORMATION, "Book Returned",
-                    "You have successfully returned the book: " + selectedBook.getTitle());
         } else {
-            showAlert(Alert.AlertType.WARNING, "Return Book",
-                    "Please select a borrowed book to return.");
+            showAlert(Alert.AlertType.WARNING, "Return Book", "Please select a borrowed book to return.");
         }
     }
+
 
     @FXML
     private void handleRenewBook() {
         Book selectedBook = borrowedBooksTable.getSelectionModel().getSelectedItem();
-        if (selectedBook != null && selectedBook.getBorrower() != null &&
-                selectedBook.getBorrower().equals(currentUser.getName())) { // Match name
-            LocalDate now = LocalDate.now();
-            LocalDate returnDate = selectedBook.getReturnDate();
+        if (selectedBook != null) {
+            String result = selectedBook.renewBook(currentUser.getName());
 
-            if (now.isAfter(returnDate)) { // Check for overdue
-                long daysOverdue = ChronoUnit.DAYS.between(returnDate, now);
-                double fine = daysOverdue * 1.00; // RM1 per day overdue
-                // Format the fine to 2 decimal places
-                String fineFormatted = String.format("%.2f", fine);
+            if (result.equals("success")) {
+                FileManager.saveBooks(library); // Save changes
+                initializeBookTables();
+                borrowedBooksTable.refresh(); // Refresh UI
 
-                showAlert(Alert.AlertType.WARNING, "Renewal Denied",
-                        "The book is overdue by " + daysOverdue + " days. Please settle a fine of RM" + fineFormatted +
-                                " with the library before renewing.");
-                return; // Prevent renewing the book
+                showAlert(Alert.AlertType.INFORMATION, "Book Renewed",
+                        "The return date for '" + selectedBook.getTitle() + "' has been extended to: " + selectedBook.getReturnDate());
+            } else {
+                showAlert(Alert.AlertType.WARNING, "Renew Book", result);
             }
-            if (ChronoUnit.DAYS.between(now, returnDate) >= 7) { // Check if renewal is too early
-                showAlert(Alert.AlertType.WARNING, "Renewal Denied",
-                        "You have already renewed a book once. You cannot renew again.");
-                return; // Prevent renewing the book
-            }
-            // Extend return date by 7 days
-            selectedBook.setReturnDate(returnDate.plusDays(7));
-            FileManager.saveBooks(library); // Save changes to the CSV
-            initializeBookTables();
-            borrowedBooksTable.refresh();
-
-            showAlert(Alert.AlertType.INFORMATION, "Book Renewed",
-                    "The return date for '" + selectedBook.getTitle() + "' has been extended to: " + selectedBook.getReturnDate());
         } else {
-            showAlert(Alert.AlertType.WARNING, "Renew Book",
-                    "Please select a borrowed book to renew.");
+            showAlert(Alert.AlertType.WARNING, "Renew Book", "Please select a borrowed book to renew.");
         }
     }
+
 
 
 
