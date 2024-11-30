@@ -83,20 +83,6 @@ public class Book {
         this.returnDate = returnDate;
     }
 
-    // Method to check if the book is overdue
-    public boolean isOverdue() {
-        return returnDate != null && LocalDate.now().isAfter(returnDate);
-    }
-
-    // Method to calculate the fine for overdue books
-    public double calculateFine() {
-        if (!isOverdue()) {
-            return 0.0;
-        }
-        long daysOverdue = LocalDate.now().toEpochDay() - returnDate.toEpochDay();
-        return daysOverdue * 1.0; // $1.00 fine per day
-    }
-
     // Method to borrow a book
     public boolean borrow(String borrowerName) {
         if (this.isAvailable()) {
@@ -160,7 +146,7 @@ public class Book {
     public String displayDetails() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
         return String.format(
-                "%s\nA %s\nISBN: %s\n %s\n %s\n %s",
+                "%s\n %s\n %s\n %s\n %s\n %s",
                 title,
                 author,
                 ISBN,

@@ -1,12 +1,12 @@
 Title,Author,ISBN,Available,Borrower,BorrowDate,ReturnDate
-Moby Dick,Herman Melville,9781503280786,true,,,
+Moby Dick,Herman Melville,9781503280786,false,John Doe,2024-11-20,2024-12-08
 Pride and Prejudice,Jane Austen,9781503290563,true,,,
 The Lord of the Rings,J.R.R. Tolkien,9780544003415,true,,,
-Crime and Punishment,Fyodor Dostoevsky,9780486415871,false,John Doe,2024-12-01,2024-12-08
-1984,Andrew McGahan,9780451524935,false,Natasha Romanoff,2024-11-25,2024-12-09
-The Great Gatsby,F. Scott Fitzgerald,9780743273565,true,,,
+Crime and Punishment,Fyodor Dostoevsky,9780486415871,false,Sam Wilson,2024-12-01,2024-12-08
+1988 (new version),Andrew McGahan,9780451524935,false,Natasha Romanoff,2024-12-01,2024-12-08
+The Great Gatsby,F. Scott Fitzgerald,9780743273565,false,Peter Parker,2024-12-01,2024-12-08
 Harry Potter and the Sorcerer's Stone,J.K. Rowling,9780439708180,true,,,
 The Catcher in the Rye,J.D. Salinger,9780316769488,true,,,
-The Hobbit,J.R. Tolkien,9780345339683,false,Bruce Wayne,2024-11-20,2024-11-27
+The Hobbit,J.R. Tolkien,9780345339683,true,,,
 War and Peace,Leo Tolstoy,9781400079988,true,,,
-The Odyssey,Homer Taylor,9780140268867,false,Peter Pan,2024-11-29,2024-12-13
+The Odyssey,Homer Taylor,9780140268867,true,,,
