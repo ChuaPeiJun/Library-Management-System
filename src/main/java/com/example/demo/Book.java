@@ -1,6 +1,7 @@
 package com.example.demo;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 // Class representing a Book
@@ -156,4 +157,16 @@ public class Book {
         return "success"; // Indicates a successful renewal
     }
 
+    public String displayDetails() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        return String.format(
+                "%s\nA %s\nISBN: %s\n %s\n %s\n %s",
+                title,
+                author,
+                ISBN,
+                borrower,
+                borrowDate.format(formatter),
+                returnDate.format(formatter)
+        );
+    }
 }

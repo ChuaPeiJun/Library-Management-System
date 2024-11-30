@@ -33,6 +33,20 @@ public class UserController {
     @FXML
     private TableView<Book> bookTable;
     @FXML
+    private Label titleLabel;
+
+    @FXML
+    private Label authorLabel;
+
+    @FXML
+    private Label isbnLabel;
+
+    @FXML
+    private Label borrowedDateLabel;
+
+    @FXML
+    private Label returnDateLabel;
+    @FXML
     private TableColumn<Book, String> titleColumn;
     @FXML
     private TableColumn<Book, String> authorColumn;
@@ -110,7 +124,7 @@ public class UserController {
         backToHomepageButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
         borrowBookButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
         viewBorrowedBooksButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold;");
-
+        resetLabels();
         borrowBookView.setVisible(false);
         borrowBookView.setManaged(false);
         borrowedBooksView.setVisible(true);
@@ -120,6 +134,7 @@ public class UserController {
     @FXML
     private void handleBackToHomepage() {
         try {
+            resetLabels();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("homepage.fxml"));
             Scene homepageScene = new Scene(loader.load(), 1200, 800);
             Stage stage = (Stage) backToHomepageButton.getScene().getWindow();
@@ -199,7 +214,19 @@ public class UserController {
             bookTable.refresh(); // Update the UI with the latest changes
             FileManager.saveBooks(library);
             initializeBookTables();
+            String details = selectedBook.displayDetails();
+            String[] lines = details.split("\n");
 
+            // Update labels
+            titleLabel.setText(lines[0]);
+            authorLabel.setText(lines[1]);
+            isbnLabel.setText(lines[2]);
+            borrowedDateLabel.setText(lines[4]);
+            returnDateLabel.setText(lines[5]);
+
+            // Save changes and refresh the table
+            FileManager.saveBooks(library);
+            bookTable.refresh();
             showAlert(Alert.AlertType.INFORMATION, "Book Borrowed",
                     "You have successfully borrowed the book: " + selectedBook.getTitle() +
                             "\nReturn by: " + selectedBook.getReturnDate());
@@ -209,6 +236,14 @@ public class UserController {
         }
     }
 
+    @FXML
+    private void resetLabels() {
+        titleLabel.setText(null);
+        authorLabel.setText(null);
+        isbnLabel.setText(null);
+        borrowedDateLabel.setText(null);
+        returnDateLabel.setText(null);
+    }
 
     @FXML
     private void handleReturnBook() {
