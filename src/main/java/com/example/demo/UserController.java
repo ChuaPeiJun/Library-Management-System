@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserController {
@@ -198,12 +199,11 @@ public class UserController {
 
     private void setupBookSearch() {
         searchBookInput.textProperty().addListener((observable, oldValue, newValue) -> {
-            FilteredList<Book> filteredBooks = new FilteredList<>(allBooks, book ->
-                    book.getTitle().toLowerCase().contains(newValue.toLowerCase()) ||
-                            book.getAuthor().toLowerCase().contains(newValue.toLowerCase()) ||
-                            book.getISBN().toLowerCase().contains(newValue.toLowerCase())
-            );
-            bookTable.setItems(filteredBooks);
+            // Use the Library's searchBooks method to filter books
+            List<Book> filteredBooks = library.searchBooks(newValue);
+
+            // Update the TableView with the filtered results
+            bookTable.setItems(FXCollections.observableArrayList(filteredBooks));
         });
     }
 

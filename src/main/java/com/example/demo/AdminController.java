@@ -309,10 +309,10 @@ public class AdminController {
     @FXML
     private void handleBackButton() {
         // Reset all buttons to default, keeping font size at 16px
-        backButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageUsersButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageLateReturnBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        backButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        manageBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold;-fx-font-size: 16px;");
+        manageUsersButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        manageLateReturnBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("homepage.fxml"));
@@ -329,10 +329,10 @@ public class AdminController {
     @FXML
     private void handleManageBooks() {
         // Update button styles and display the Book Management view
-        backButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageBooksButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageUsersButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageLateReturnBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        backButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        manageBooksButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        manageUsersButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        manageLateReturnBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
 
         bookManagementView.setVisible(true);
         userManagementView.setVisible(false);
@@ -343,14 +343,32 @@ public class AdminController {
     @FXML
     private void handleManageUsers() {
         // Update button styles and display the User Management view
-        backButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageUsersButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageLateReturnBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
+        backButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        manageBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        manageUsersButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        manageLateReturnBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
 
         userManagementView.setVisible(true);
         bookManagementView.setVisible(false);
         lateReturnBooksView.setVisible(false);
+    }
+
+    // Method to handle switching to the Late Return Books management view
+    @FXML
+    private void handleManageLateReturnBooks() {
+        // Update button styles and font size
+        backButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        manageBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        manageUsersButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+        manageLateReturnBooksButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 16px;");
+
+        // Update visible views
+        bookManagementView.setVisible(false);
+        userManagementView.setVisible(false);
+        lateReturnBooksView.setVisible(true);
+
+        // Ensure the table is up-to-date
+        initializeBorrowedBooksTable();
     }
 
     // Handle Add New Book button click
@@ -390,6 +408,8 @@ public class AdminController {
                 library.addBook(newBook);
                 allBooks.add(newBook); // Update the ObservableList
                 FileManager.saveBooks(library);
+                // Update the TableView
+                bookTable.setItems(FXCollections.observableArrayList(library.getBooks()));
             }
         });
     }
@@ -412,13 +432,17 @@ public class AdminController {
             // Wait for confirmation
             confirmationAlert.showAndWait().ifPresent(response -> {
                 if (response == ButtonType.OK) {
-                    // Remove the book from the library's list and ObservableList
-                    library.getBooks().remove(selectedBook); // Remove from the library data
-                    allBooks.remove(selectedBook); // Remove from the ObservableList
-                    FileManager.saveBooks(library); // Save the updated library to the file
+                    // Use the deleteBook method in Library to remove the book
+                    boolean isDeleted = library.deleteBook(selectedBook);
+                    if (isDeleted) {
+                        allBooks.remove(selectedBook); // Remove from the ObservableList
+                        FileManager.saveBooks(library); // Save the updated library to the file
 
-                    // Update the TableView
-                    bookTable.setItems(FXCollections.observableArrayList(library.getBooks()));
+                        // Update the TableView
+                        bookTable.setItems(FXCollections.observableArrayList(library.getBooks()));
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Delete Error", "Failed to delete the book.");
+                    }
                 }
             });
         } else {
@@ -462,11 +486,15 @@ public class AdminController {
                     return;
                 }
 
-                // Add new user to the list and TableView
+                // Add new user to the list
                 User newUser = new User(name, id);
                 users.add(newUser);
-                userTable.getItems().add(newUser); // Update the TableView
-                FileManager.saveUsers(users); // Save the updated list of users
+
+                // Save the updated list of users
+                FileManager.saveUsers(users);
+
+                // Reload the TableView
+                userTable.setItems(FXCollections.observableArrayList(users));
             }
         });
     }
@@ -509,12 +537,9 @@ public class AdminController {
     private void handleSearchBooks() {
         // Add listener to filter book list based on search input
         searchBookInput.textProperty().addListener((observable, oldValue, newValue) -> {
-            FilteredList<Book> filteredBooks = new FilteredList<>(allBooks, book ->
-                    book.getTitle().toLowerCase().contains(newValue.toLowerCase()) ||
-                            book.getAuthor().toLowerCase().contains(newValue.toLowerCase()) ||
-                            book.getISBN().toLowerCase().contains(newValue.toLowerCase())
-            );
-            bookTable.setItems(filteredBooks); // Update TableView with filtered list
+            // Use Library's searchBooks method
+            List<Book> filteredBooks = library.searchBooks(newValue);
+            bookTable.setItems(FXCollections.observableArrayList(filteredBooks)); // Update TableView with filtered list
         });
     }
 
@@ -592,24 +617,6 @@ public class AdminController {
                         .collect(Collectors.toList())
         );
         borrowedBooksTable.setItems(overdueBooks);
-    }
-
-    // Method to handle switching to the Late Return Books management view
-    @FXML
-    private void handleManageLateReturnBooks() {
-        // Update button styles and font size
-        backButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageBooksButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageUsersButton.setStyle("-fx-background-color: #8b9dc3; -fx-text-fill: white; -fx-font-size: 16px;");
-        manageLateReturnBooksButton.setStyle("-fx-background-color: #3b5998; -fx-text-fill: white; -fx-font-size: 16px;");
-
-        // Update visible views
-        bookManagementView.setVisible(false);
-        userManagementView.setVisible(false);
-        lateReturnBooksView.setVisible(true);
-
-        // Ensure the table is up-to-date
-        initializeBorrowedBooksTable();
     }
 
     // Method to handle renewing a book's return date
