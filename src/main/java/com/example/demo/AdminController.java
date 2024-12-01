@@ -12,7 +12,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -90,13 +89,9 @@ public class AdminController {
     @FXML
     private TableColumn<Book, String> bookReturnDateColumn;
 
-
-    @FXML
-    private ListView<String> borrowedBooksListView;
-
     private ObservableList<Book> allBooks;
-    private Library library = new Library();
-    private ArrayList<User> users = new ArrayList<>();
+    private final Library library = new Library();
+    private final ArrayList<User> users = new ArrayList<>();
 
     @FXML
     public void initialize() {
@@ -124,26 +119,13 @@ public class AdminController {
         bookManagementView.setVisible(true);
         lateReturnBooksView.setVisible(false);
 
-        // Set up columns and populate data for the book table
         initializeBookTable();
-
-        // Set up columns and populate data for the user table
         initializeUserTable();
-
-        // Setup search functionality for books and users
         setupSearchFunctionality();
-
-        // Setup tables and UI components for late return books and borrowed books
         setupLateReturnBooksTable();
         initializeBorrowedBooksTable();
-
-        // Make book table columns editable and save changes on edit
         setupEditableBookColumns();
-
-        // Make user table columns editable and save changes on edit
         setupEditableUserColumns();
-
-        // Initialize borrowed books logic
         initializeBorrowedBooks();
     }
 
@@ -196,13 +178,13 @@ public class AdminController {
         });
     }
 
-    // Method to setup search functionality for books and users
+    // Method to set up search functionality for books and users
     private void setupSearchFunctionality() {
-        handleSearchBooks(); // Search logic for books
-        handleSearchUsers(); // Search logic for users
+        handleSearchBooks();
+        handleSearchUsers();
     }
 
-    // Method to setup editable columns in the book table
+    // Method to set up editable columns in the book table
     private void setupEditableBookColumns() {
         // Editable title column
         titleColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -268,7 +250,7 @@ public class AdminController {
         FileManager.saveUsers(users);  // Save updated user list
     }
 
-    // Method to setup editable columns in the user table
+    // Method to set up editable columns in the user table
     private void setupEditableUserColumns() {
         // Editable name column
         nameColumn.setCellFactory(TextFieldTableCell.forTableColumn());
@@ -585,7 +567,7 @@ public class AdminController {
     }
 
 
-    // Method to setup the late return books table
+    // Method to set up the late return books table
     private void setupLateReturnBooksTable() {
         borrowedTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         borrowerNameColumn.setCellValueFactory(data ->

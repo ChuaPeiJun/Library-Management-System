@@ -12,7 +12,7 @@
 <AnchorPane prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: linear-gradient(to bottom, #ffffff, #add8e6);" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo.LibraryAppController">
 
     <!-- Background Decoration -->
-    <StackPane alignment="CENTER" AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+    <StackPane AnchorPane.topAnchor="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
         <!-- Decorative Rectangle for Styling -->
         <Rectangle width="600.0" height="700.0" arcWidth="50.0" arcHeight="50.0" fill="white" stroke="#d3d3d3" strokeWidth="1.5"/>
 
@@ -21,7 +21,7 @@
             <!-- Welcome Text -->
             <Text style="-fx-font-size: 40px; -fx-font-weight: bold; -fx-fill: #3b5998;" text="Welcome to the Library Management System" wrappingWidth="500.0" textAlignment="CENTER">
                 <effect>
-                    <DropShadow radius="10.0" color="#8b9dc3"/>
+                    <DropShadow color="#8b9dc3"/>
                 </effect>
             </Text>
 

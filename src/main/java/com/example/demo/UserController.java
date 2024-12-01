@@ -3,7 +3,6 @@ package com.example.demo;
 import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -14,8 +13,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -84,8 +81,8 @@ public class UserController {
     @FXML
     private TableColumn<Book, String> returnDateColumn;
 
-    private Library library = new Library();
-    private ArrayList<User> users = new ArrayList<>();
+    private final Library library = new Library();
+    private final ArrayList<User> users = new ArrayList<>();
     private User currentUser;
     private ObservableList<Book> allBooks;
     private ObservableList<Book> borrowedBooks;
@@ -268,7 +265,6 @@ public class UserController {
         }
     }
 
-
     @FXML
     private void handleRenewBook() {
         Book selectedBook = borrowedBooksTable.getSelectionModel().getSelectedItem();
@@ -289,9 +285,6 @@ public class UserController {
             showAlert(Alert.AlertType.WARNING, "Renew Book", "Please select a borrowed book to renew.");
         }
     }
-
-
-
 
     private void showAlert(Alert.AlertType type, String title, String message) {
         Alert alert = new Alert(type);

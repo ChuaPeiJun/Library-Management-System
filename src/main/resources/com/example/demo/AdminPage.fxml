@@ -19,7 +19,7 @@
     <!-- Header -->
     <Text layoutX="20" layoutY="60" style="-fx-font-size: 40px; -fx-font-weight: bold; -fx-fill: #1e3a8a;" text="Admin Management Page" wrappingWidth="500.0" textAlignment="CENTER">
         <effect>
-            <DropShadow radius="10.0" color="#3b5998" />
+            <DropShadow color="#3b5998" />
         </effect>
     </Text>
 
@@ -101,8 +101,8 @@
             </columns>
         </TableView>
         <HBox spacing="20">
-            <Button fx:id="renewBookButton" onAction="#handleRenewBook" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10px;" text="Renew Book" />
-            <Button fx:id="returnBookButton" onAction="#handleReturnBook" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10px;" text="Return Book" />
+            <Button onAction="#handleRenewBook" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10px;" text="Renew Book" />
+            <Button onAction="#handleReturnBook" style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 10px;" text="Return Book" />
         </HBox>
 </VBox>
 </AnchorPane>

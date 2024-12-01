@@ -3,11 +3,11 @@ package com.example.demo;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-// Class representing a User
+
 public class User {
     private String name; // User's name
     private String id; // User's unique identifier
-    private ObservableList<Book> borrowedBooks; // ObservableList of books borrowed by the user
+    private final ObservableList<Book> borrowedBooks; // ObservableList of books borrowed by the user
 
     // Constructor to initialize a User with a name and id
     public User(String name, String id) {

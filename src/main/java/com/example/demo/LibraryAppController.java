@@ -21,8 +21,8 @@ public class LibraryAppController {
 
     private static final String ADMIN_PASSWORD = "123456"; // Define your password here
 
-    private Library library = new Library();
-    private ArrayList<User> users = new ArrayList<>();
+    private final Library library = new Library();
+    private final ArrayList<User> users = new ArrayList<>();
 
     // Initialize method to load users from the file
     public void initialize() {
