@@ -5,6 +5,8 @@
 The Library Management System is a desktop application built using Java and JavaFX that provides an intuitive interface for managing books and users in a library environment.
 The system includes separate functionalities for Administrators and Users, enabling efficient management of books, borrowing, and penalties.
 
+🎥 **[Watch Demo Video](https://youtu.be/4X-nH_Iu1Jo)**  
+
 This project demonstrates strong understanding and application of:
 
 - Object-Oriented Programming (OOP) principles
